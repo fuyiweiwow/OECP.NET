@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using HZH_Controls;
 
 namespace OECP.Canvas
 {
@@ -16,7 +17,7 @@ namespace OECP.Canvas
         /// <summary>
         /// 绘画正方形
         /// </summary>
-        private Rectangle _square;
+        private RectangleF _square;
 
         /// <summary>
         /// 网格线数目
@@ -42,14 +43,13 @@ namespace OECP.Canvas
 
         public OECPCanvas()
         {
-            Init();
         }
         public void SetGridNum(int num)
         {
             this._gridNum = num;
         }
 
-        private void Init()
+        public void Init()
         {
             this.DoubleBuffered = true;
             this.MouseWheel += OECPCanvas_MouseWheel;
@@ -57,8 +57,22 @@ namespace OECP.Canvas
             this.MouseDown += OECPCanvas_MouseDown;
             this.MouseMove += OECPCanvas_MouseMove;
             this.MouseUp += OECPCanvas_MouseUp;
+            this.Resize += OECPCanvas_Resize;
             _square = InitSquare();
             this.BackColor = Color.White;
+        }
+
+
+        public void ReInitSquarePosition()
+        {
+            _square = InitSquare();
+            Invalidate();
+        }
+
+
+        private void OECPCanvas_Resize(object sender, EventArgs e)
+        {
+            ReInitSquarePosition();
         }
 
         private void OECPCanvas_MouseUp(object sender, MouseEventArgs e)
@@ -94,24 +108,28 @@ namespace OECP.Canvas
             ResetSquare(_square, e.Graphics);
         }
 
-        private void ResetSquare(Rectangle rec, Graphics g)
+        private void ResetSquare(RectangleF rec, Graphics g)
         {
             g.Clear(Color.White);
             Pen p = new Pen(Brushes.Black, 1);
-            g.DrawRectangle(p, rec);
+            g.DrawRectangle(p, rec.X, rec.Y, rec.Width, rec.Height); 
             DrawGridLine(g);
         }
 
 
-        private Rectangle InitSquare()
+        private RectangleF InitSquare()
         {
-            var baseLength = this.Width > this.Height ? Height : Width;
-            var initLength = baseLength - 5;
-            var lx = Width / 2 - initLength / 2;
-            var basePoint = new Point(lx,
-                lx);
-            var ret = new Rectangle(basePoint, new Size(initLength, initLength));
-            ret.Inflate(200,200);
+            var wx = this.Parent.Width;
+            var ht = this.Parent.Height;
+            var baseLength = wx > ht ? ht : wx;
+            var initLength = (float)baseLength * 4 / 5;
+            
+            var centerPoint = new PointF((float)wx / 2, (float)ht / 2);
+            var slide = initLength / 2;
+            var basePoint = new PointF(centerPoint.X - slide,
+                centerPoint.Y - slide);
+
+            var ret = new RectangleF(basePoint, new SizeF(initLength, initLength)); 
             return ret;
         }
 
@@ -121,7 +139,7 @@ namespace OECP.Canvas
             var sideLen = _square.Width;
 
             //横线
-            float step = (float)sideLen / _gridNum;
+            float step = sideLen / _gridNum;
 
             Pen p = new Pen(Brushes.Gray, 1);
 

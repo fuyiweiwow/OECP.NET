@@ -1,6 +1,8 @@
 ﻿using System.Windows.Forms;
 using CCWin;
 using OECP.Canvas;
+using OECP.NET.ControlStation;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace OECP.NET
 {
@@ -10,10 +12,16 @@ namespace OECP.NET
         {
             InitializeComponent();
 
+            FormTest form2 = new FormTest();
+            form2.Show(dockPanelMain);
+            form2.Dock = DockStyle.Left;
+            form2.DockState = DockState.DockLeft;
             var canvas = new OECPCanvas();
             canvas.Dock = DockStyle.Fill;
-            this.mainContainer.Panel2.Controls.Add(canvas);
-
+            dockPanelMain.Controls.Add(canvas);
+            form2.SendToBack();
+            canvas.BringToFront();
+            canvas.Init();
 
         }
     }

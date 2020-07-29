@@ -31,10 +31,8 @@
             this.menuStripMain = new System.Windows.Forms.MenuStrip();
             this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.编辑ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.mainContainer = new CCWin.SkinControl.SkinSplitContainer();
+            this.dockPanelMain = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.menuStripMain.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.mainContainer)).BeginInit();
-            this.mainContainer.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStripMain
@@ -44,7 +42,7 @@
             this.编辑ToolStripMenuItem});
             this.menuStripMain.Location = new System.Drawing.Point(4, 28);
             this.menuStripMain.Name = "menuStripMain";
-            this.menuStripMain.Size = new System.Drawing.Size(956, 25);
+            this.menuStripMain.Size = new System.Drawing.Size(963, 25);
             this.menuStripMain.TabIndex = 0;
             this.menuStripMain.Text = "menuStripMain";
             // 
@@ -60,31 +58,27 @@
             this.编辑ToolStripMenuItem.Size = new System.Drawing.Size(44, 21);
             this.编辑ToolStripMenuItem.Text = "编辑";
             // 
-            // mainContainer
+            // dockPanelMain
             // 
-            this.mainContainer.Cursor = System.Windows.Forms.Cursors.Default;
-            this.mainContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mainContainer.LineBack2 = System.Drawing.Color.Silver;
-            this.mainContainer.Location = new System.Drawing.Point(4, 53);
-            this.mainContainer.Name = "mainContainer";
-            this.mainContainer.Size = new System.Drawing.Size(956, 504);
-            this.mainContainer.SplitterDistance = 240;
-            this.mainContainer.TabIndex = 1;
+            this.dockPanelMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dockPanelMain.Location = new System.Drawing.Point(4, 53);
+            this.dockPanelMain.Name = "dockPanelMain";
+            this.dockPanelMain.Size = new System.Drawing.Size(963, 504);
+            this.dockPanelMain.TabIndex = 3;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.LightSteelBlue;
-            this.ClientSize = new System.Drawing.Size(964, 561);
-            this.Controls.Add(this.mainContainer);
+            this.ClientSize = new System.Drawing.Size(971, 561);
+            this.Controls.Add(this.dockPanelMain);
             this.Controls.Add(this.menuStripMain);
+            this.IsMdiContainer = true;
             this.Name = "MainForm";
-            this.Text = "OECP";
+            this.Text = "OrigamiEasyCreaseParttern V1.0";
             this.menuStripMain.ResumeLayout(false);
             this.menuStripMain.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.mainContainer)).EndInit();
-            this.mainContainer.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -95,7 +89,7 @@
         private System.Windows.Forms.MenuStrip menuStripMain;
         private System.Windows.Forms.ToolStripMenuItem 文件ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 编辑ToolStripMenuItem;
-        private CCWin.SkinControl.SkinSplitContainer mainContainer;
+        private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanelMain;
     }
 }
 
