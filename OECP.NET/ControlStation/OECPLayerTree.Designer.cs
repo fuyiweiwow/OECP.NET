@@ -28,11 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OECPLayerTree));
             this.panel1 = new System.Windows.Forms.Panel();
             this.layerTree = new CCWin.SkinControl.SkinTreeView();
             this.tabControlExt1 = new HZH_Controls.Controls.TabControlExt();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.treeLayerImages = new System.Windows.Forms.ImageList(this.components);
             this.tabControlExt1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -50,11 +53,18 @@
             this.layerTree.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.layerTree.CheckBoxes = true;
             this.layerTree.Dock = System.Windows.Forms.DockStyle.Top;
-            this.layerTree.Indent = 20;
+            this.layerTree.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.layerTree.FullRowSelect = true;
+            this.layerTree.ImageIndex = 0;
+            this.layerTree.ImageList = this.treeLayerImages;
+            this.layerTree.Indent = 30;
             this.layerTree.ItemHeight = 25;
             this.layerTree.LineColor = System.Drawing.Color.White;
             this.layerTree.Location = new System.Drawing.Point(0, 20);
             this.layerTree.Name = "layerTree";
+            this.layerTree.SelectedImageIndex = 0;
+            this.layerTree.ShowPlusMinus = false;
+            this.layerTree.ShowRootLines = false;
             this.layerTree.Size = new System.Drawing.Size(283, 184);
             this.layerTree.TabIndex = 1;
             // 
@@ -77,23 +87,34 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.tabPage1.Location = new System.Drawing.Point(4, 34);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage1.Size = new System.Drawing.Size(275, 208);
             this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "tabPage1";
+            this.tabPage1.Text = "图层操作";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // tabPage2
             // 
             this.tabPage2.Location = new System.Drawing.Point(4, 34);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(275, 125);
+            this.tabPage2.Size = new System.Drawing.Size(275, 208);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "tabPage2";
+            this.tabPage2.Text = "画布检查";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // treeLayerImages
+            // 
+            this.treeLayerImages.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("treeLayerImages.ImageStream")));
+            this.treeLayerImages.TransparentColor = System.Drawing.Color.Transparent;
+            this.treeLayerImages.Images.SetKeyName(0, "dot  black.png");
+            this.treeLayerImages.Images.SetKeyName(1, "grey line.png");
+            this.treeLayerImages.Images.SetKeyName(2, "grid.png");
+            this.treeLayerImages.Images.SetKeyName(3, "simple blue line.png");
+            this.treeLayerImages.Images.SetKeyName(4, "simple red line.png");
+            this.treeLayerImages.Images.SetKeyName(5, "layer.png");
             // 
             // OECPLayerTree
             // 
@@ -118,5 +139,6 @@
         private HZH_Controls.Controls.TabControlExt tabControlExt1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.ImageList treeLayerImages;
     }
 }

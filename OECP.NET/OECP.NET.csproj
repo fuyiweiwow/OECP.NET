@@ -109,5 +109,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Content Include="Images\dot  black.png" />
+    <Content Include="Images\grey line.png" />
+    <Content Include="Images\grid.png" />
+    <Content Include="Images\layer.png" />
+    <Content Include="Images\simple blue line.png" />
+    <Content Include="Images\simple red line.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
