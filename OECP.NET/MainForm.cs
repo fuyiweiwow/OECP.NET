@@ -12,7 +12,7 @@ namespace OECP.NET
         {
             InitializeComponent();
 
-            FormTest form2 = new FormTest();
+            OECPLayerTree form2 = new OECPLayerTree();
             form2.Show(dockPanelMain);
             form2.Dock = DockStyle.Left;
             form2.DockState = DockState.DockLeft;

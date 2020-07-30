@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,11 +12,16 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace OECP.NET.ControlStation
 {
-    public partial class FormTest : DockContent
+    public partial class OECPLayerTree : DockContent
     {
-        public FormTest()
+        public OECPLayerTree()
         {
             InitializeComponent();
+            FormBorderStyle = FormBorderStyle.None;
+
+            var root = new  TreeNode("画布图层");
+            root.Nodes.Add(new TreeNode("test"));
+            layerTree.Nodes.Add(root);
         }
     }
 }
