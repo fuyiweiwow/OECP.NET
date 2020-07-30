@@ -1,11 +1,17 @@
-﻿namespace OECP.NET.ControlStation
+﻿using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+using CCWin.SkinControl;
+using HZH_Controls.Controls;
+
+namespace OECP.NET.ControlStation
 {
     partial class OECPLayerTree
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -32,10 +38,10 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OECPLayerTree));
             this.panel1 = new System.Windows.Forms.Panel();
             this.layerTree = new CCWin.SkinControl.SkinTreeView();
+            this.treeLayerImages = new System.Windows.Forms.ImageList(this.components);
             this.tabControlExt1 = new HZH_Controls.Controls.TabControlExt();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.treeLayerImages = new System.Windows.Forms.ImageList(this.components);
             this.tabControlExt1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -67,6 +73,20 @@
             this.layerTree.ShowRootLines = false;
             this.layerTree.Size = new System.Drawing.Size(283, 184);
             this.layerTree.TabIndex = 1;
+            this.layerTree.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.layerTree_BeforeCheck);
+            this.layerTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.layerTree_AfterCheck);
+            this.layerTree.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.layerTree_BeforeSelect);
+            // 
+            // treeLayerImages
+            // 
+            this.treeLayerImages.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("treeLayerImages.ImageStream")));
+            this.treeLayerImages.TransparentColor = System.Drawing.Color.Transparent;
+            this.treeLayerImages.Images.SetKeyName(0, "dot  black.png");
+            this.treeLayerImages.Images.SetKeyName(1, "grey line.png");
+            this.treeLayerImages.Images.SetKeyName(2, "grid.png");
+            this.treeLayerImages.Images.SetKeyName(3, "simple blue line.png");
+            this.treeLayerImages.Images.SetKeyName(4, "simple red line.png");
+            this.treeLayerImages.Images.SetKeyName(5, "layer.png");
             // 
             // tabControlExt1
             // 
@@ -105,26 +125,20 @@
             this.tabPage2.Text = "画布检查";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // treeLayerImages
-            // 
-            this.treeLayerImages.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("treeLayerImages.ImageStream")));
-            this.treeLayerImages.TransparentColor = System.Drawing.Color.Transparent;
-            this.treeLayerImages.Images.SetKeyName(0, "dot  black.png");
-            this.treeLayerImages.Images.SetKeyName(1, "grey line.png");
-            this.treeLayerImages.Images.SetKeyName(2, "grid.png");
-            this.treeLayerImages.Images.SetKeyName(3, "simple blue line.png");
-            this.treeLayerImages.Images.SetKeyName(4, "simple red line.png");
-            this.treeLayerImages.Images.SetKeyName(5, "layer.png");
-            // 
             // OECPLayerTree
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(283, 450);
+            this.CloseButton = false;
+            this.CloseButtonVisible = false;
             this.Controls.Add(this.tabControlExt1);
             this.Controls.Add(this.layerTree);
             this.Controls.Add(this.panel1);
+            this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.HideOnClose = true;
             this.Name = "OECPLayerTree";
             this.Text = "图层";
             this.tabControlExt1.ResumeLayout(false);
@@ -134,11 +148,11 @@
 
         #endregion
 
-        private System.Windows.Forms.Panel panel1;
-        private CCWin.SkinControl.SkinTreeView layerTree;
-        private HZH_Controls.Controls.TabControlExt tabControlExt1;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.ImageList treeLayerImages;
+        private Panel panel1;
+        private SkinTreeView layerTree;
+        private TabControlExt tabControlExt1;
+        private TabPage tabPage1;
+        private TabPage tabPage2;
+        private ImageList treeLayerImages;
     }
 }

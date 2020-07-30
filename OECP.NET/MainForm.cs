@@ -21,8 +21,9 @@ namespace OECP.NET
             var canvas = new OECPCanvas {Dock = DockStyle.Fill};
             dockPanelMain.Controls.Add(canvasPanel);
             form2.SendToBack();
-            canvasPanel.BringToFront();
+            
             canvasPanel.Controls.Add(canvas);
+            canvasPanel.BringToFront();
             canvas.Init();
 
         }

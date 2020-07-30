@@ -57,10 +57,15 @@ namespace OECP.Canvas
             this.MouseMove += OECPCanvas_MouseMove;
             this.MouseUp += OECPCanvas_MouseUp;
             this.Resize += OECPCanvas_Resize;
+            this.Layout += OECPCanvas_Layout;
             _square = InitSquare();
             this.BackColor = Color.White;
         }
 
+        private void OECPCanvas_Layout(object sender, LayoutEventArgs e)
+        {
+            ReInitSquarePosition();
+        }
 
         public void ReInitSquarePosition()
         {
