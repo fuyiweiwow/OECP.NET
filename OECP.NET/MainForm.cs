@@ -16,11 +16,13 @@ namespace OECP.NET
             form2.Show(dockPanelMain);
             form2.Dock = DockStyle.Left;
             form2.DockState = DockState.DockLeft;
-            var canvas = new OECPCanvas();
-            canvas.Dock = DockStyle.Fill;
-            dockPanelMain.Controls.Add(canvas);
+
+            Panel canvasPanel = new Panel {Dock = DockStyle.Fill};
+            var canvas = new OECPCanvas {Dock = DockStyle.Fill};
+            dockPanelMain.Controls.Add(canvasPanel);
             form2.SendToBack();
-            canvas.BringToFront();
+            canvasPanel.BringToFront();
+            canvasPanel.Controls.Add(canvas);
             canvas.Init();
 
         }

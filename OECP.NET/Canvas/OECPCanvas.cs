@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using HZH_Controls;
 
 namespace OECP.Canvas
 {
