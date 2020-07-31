@@ -65,6 +65,15 @@
     <Compile Include="Canvas\OECPCanvas.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ControlStation\BaseControl\BaseTreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ControlStation\OECPGridControlPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlStation\OECPGridControlPanel.Designer.cs">
+      <DependentUpon>OECPGridControlPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="ControlStation\OECPLayerTree.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -82,6 +91,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\Settings.cs" />
+    <EmbeddedResource Include="ControlStation\OECPGridControlPanel.resx">
+      <DependentUpon>OECPGridControlPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ControlStation\OECPLayerTree.resx">
       <DependentUpon>OECPLayerTree.cs</DependentUpon>
     </EmbeddedResource>

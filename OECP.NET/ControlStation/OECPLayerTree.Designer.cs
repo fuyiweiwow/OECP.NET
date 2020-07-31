@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using CCWin.SkinControl;
 using HZH_Controls.Controls;
+using OECP.NET.ControlStation.BaseControl;
 
 namespace OECP.NET.ControlStation
 {
@@ -37,11 +38,11 @@ namespace OECP.NET.ControlStation
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OECPLayerTree));
             this.panel1 = new System.Windows.Forms.Panel();
-            this.layerTree = new CCWin.SkinControl.SkinTreeView();
             this.treeLayerImages = new System.Windows.Forms.ImageList(this.components);
             this.tabControlExt1 = new HZH_Controls.Controls.TabControlExt();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.layerTree = new OECP.NET.ControlStation.BaseControl.BaseTreeView();
             this.tabControlExt1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -53,29 +54,6 @@ namespace OECP.NET.ControlStation
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(283, 20);
             this.panel1.TabIndex = 0;
-            // 
-            // layerTree
-            // 
-            this.layerTree.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.layerTree.CheckBoxes = true;
-            this.layerTree.Dock = System.Windows.Forms.DockStyle.Top;
-            this.layerTree.ForeColor = System.Drawing.SystemColors.InfoText;
-            this.layerTree.FullRowSelect = true;
-            this.layerTree.ImageIndex = 0;
-            this.layerTree.ImageList = this.treeLayerImages;
-            this.layerTree.Indent = 30;
-            this.layerTree.ItemHeight = 25;
-            this.layerTree.LineColor = System.Drawing.Color.White;
-            this.layerTree.Location = new System.Drawing.Point(0, 20);
-            this.layerTree.Name = "layerTree";
-            this.layerTree.SelectedImageIndex = 0;
-            this.layerTree.ShowPlusMinus = false;
-            this.layerTree.ShowRootLines = false;
-            this.layerTree.Size = new System.Drawing.Size(283, 184);
-            this.layerTree.TabIndex = 1;
-            this.layerTree.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.layerTree_BeforeCheck);
-            this.layerTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.layerTree_AfterCheck);
-            this.layerTree.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.layerTree_BeforeSelect);
             // 
             // treeLayerImages
             // 
@@ -125,6 +103,30 @@ namespace OECP.NET.ControlStation
             this.tabPage2.Text = "画布检查";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // layerTree
+            // 
+            this.layerTree.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.layerTree.CheckBoxes = true;
+            this.layerTree.Dock = System.Windows.Forms.DockStyle.Top;
+            this.layerTree.ForeColor = System.Drawing.SystemColors.InfoText;
+            this.layerTree.FullRowSelect = true;
+            this.layerTree.ImageIndex = 0;
+            this.layerTree.ImageList = this.treeLayerImages;
+            this.layerTree.Indent = 30;
+            this.layerTree.ItemHeight = 25;
+            this.layerTree.LineColor = System.Drawing.Color.White;
+            this.layerTree.Location = new System.Drawing.Point(0, 20);
+            this.layerTree.Name = "layerTree";
+            this.layerTree.SelectedImageIndex = 0;
+            this.layerTree.ShowPlusMinus = false;
+            this.layerTree.ShowRootLines = false;
+            this.layerTree.Size = new System.Drawing.Size(283, 184);
+            this.layerTree.TabIndex = 1;
+            this.layerTree.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.layerTree_BeforeCheck);
+            this.layerTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.layerTree_AfterCheck);
+            this.layerTree.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.layerTree_BeforeSelect);
+            this.layerTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.layerTree_AfterSelect);
+            // 
             // OECPLayerTree
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -149,7 +151,7 @@ namespace OECP.NET.ControlStation
         #endregion
 
         private Panel panel1;
-        private SkinTreeView layerTree;
+        private BaseTreeView layerTree;
         private TabControlExt tabControlExt1;
         private TabPage tabPage1;
         private TabPage tabPage2;

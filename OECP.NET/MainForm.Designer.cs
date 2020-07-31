@@ -76,7 +76,7 @@
             this.Controls.Add(this.menuStripMain);
             this.IsMdiContainer = true;
             this.Name = "MainForm";
-            this.Text = "OrigamiEasyCreaseParttern V1.0";
+            this.Text = "OrigamiEasyCreasePattern V1.0";
             this.menuStripMain.ResumeLayout(false);
             this.menuStripMain.PerformLayout();
             this.ResumeLayout(false);
