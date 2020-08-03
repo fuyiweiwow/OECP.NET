@@ -12,20 +12,27 @@ namespace OECP.NET
         {
             InitializeComponent();
 
-            OECPLayerTree form2 = new OECPLayerTree();
+
+            Panel canvasPanel = new Panel { Dock = DockStyle.Fill };
+            var canvas = new OECPCanvas { Dock = DockStyle.Fill };
+            dockPanelMain.Controls.Add(canvasPanel);
+
+            OECPLayerTree form2 = new OECPLayerTree(canvas);
             form2.Show(dockPanelMain);
             form2.Dock = DockStyle.Left;
             form2.DockState = DockState.DockLeft;
-
-            Panel canvasPanel = new Panel {Dock = DockStyle.Fill};
-            var canvas = new OECPCanvas {Dock = DockStyle.Fill};
-            dockPanelMain.Controls.Add(canvasPanel);
             form2.SendToBack();
-            
+
             canvasPanel.Controls.Add(canvas);
             canvasPanel.BringToFront();
             canvas.Init();
 
+
+           
+
+         
+
         }
+
     }
 }

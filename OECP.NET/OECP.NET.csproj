@@ -80,6 +80,7 @@
     <Compile Include="ControlStation\OECPLayerTree.Designer.cs">
       <DependentUpon>OECPLayerTree.cs</DependentUpon>
     </Compile>
+    <Compile Include="ICanvasSignal.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

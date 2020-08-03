@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using OECP.NET;
 
 namespace OECP.Canvas
 {
-    class OECPCanvas : Panel
+    class OECPCanvas : Panel, ICanvasSignal
     {
         /// <summary>
         /// 缩放比例
@@ -172,8 +173,10 @@ namespace OECP.Canvas
         }
 
 
-        
-
-
+        public void UpdateGrid(int gridNum)
+        {
+            _gridNum = gridNum;
+            Invalidate();
+        }
     }
 }

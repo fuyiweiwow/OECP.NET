@@ -31,21 +31,23 @@
             this.nudGridNum = new System.Windows.Forms.NumericUpDown();
             this.lblGridNum = new System.Windows.Forms.Label();
             this.btnM2 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnD2 = new System.Windows.Forms.Button();
+            this.btnReset = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.nudGridNum)).BeginInit();
             this.SuspendLayout();
             // 
             // nudGridNum
             // 
-            this.nudGridNum.Location = new System.Drawing.Point(86, 148);
+            this.nudGridNum.Location = new System.Drawing.Point(100, 24);
             this.nudGridNum.Name = "nudGridNum";
-            this.nudGridNum.Size = new System.Drawing.Size(159, 21);
+            this.nudGridNum.Size = new System.Drawing.Size(116, 21);
             this.nudGridNum.TabIndex = 0;
+            this.nudGridNum.ValueChanged += new System.EventHandler(this.nudGridNum_ValueChanged);
             // 
             // lblGridNum
             // 
             this.lblGridNum.AutoSize = true;
-            this.lblGridNum.Location = new System.Drawing.Point(15, 153);
+            this.lblGridNum.Location = new System.Drawing.Point(15, 26);
             this.lblGridNum.Name = "lblGridNum";
             this.lblGridNum.Size = new System.Drawing.Size(65, 12);
             this.lblGridNum.TabIndex = 1;
@@ -55,30 +57,42 @@
             // 
             this.btnM2.Location = new System.Drawing.Point(17, 64);
             this.btnM2.Name = "btnM2";
-            this.btnM2.Size = new System.Drawing.Size(75, 23);
+            this.btnM2.Size = new System.Drawing.Size(50, 23);
             this.btnM2.TabIndex = 2;
             this.btnM2.Text = "X2";
             this.btnM2.UseVisualStyleBackColor = true;
+            this.btnM2.Click += new System.EventHandler(this.btnM2_Click);
             // 
-            // button2
+            // btnD2
             // 
-            this.button2.Location = new System.Drawing.Point(138, 64);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 3;
-            this.button2.Text = "X1/2";
-            this.button2.UseVisualStyleBackColor = true;
+            this.btnD2.Location = new System.Drawing.Point(90, 64);
+            this.btnD2.Name = "btnD2";
+            this.btnD2.Size = new System.Drawing.Size(50, 23);
+            this.btnD2.TabIndex = 3;
+            this.btnD2.Text = "X1/2";
+            this.btnD2.UseVisualStyleBackColor = true;
+            this.btnD2.Click += new System.EventHandler(this.btnD2_Click);
+            // 
+            // btnReset
+            // 
+            this.btnReset.Location = new System.Drawing.Point(158, 64);
+            this.btnReset.Name = "btnReset";
+            this.btnReset.Size = new System.Drawing.Size(58, 23);
+            this.btnReset.TabIndex = 4;
+            this.btnReset.Text = "重置";
+            this.btnReset.UseVisualStyleBackColor = true;
             // 
             // OECPGridControlPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.button2);
+            this.Controls.Add(this.btnReset);
+            this.Controls.Add(this.btnD2);
             this.Controls.Add(this.btnM2);
             this.Controls.Add(this.lblGridNum);
             this.Controls.Add(this.nudGridNum);
             this.Name = "OECPGridControlPanel";
-            this.Size = new System.Drawing.Size(262, 185);
+            this.Size = new System.Drawing.Size(246, 101);
             ((System.ComponentModel.ISupportInitialize)(this.nudGridNum)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -90,6 +104,7 @@
         private System.Windows.Forms.NumericUpDown nudGridNum;
         private System.Windows.Forms.Label lblGridNum;
         private System.Windows.Forms.Button btnM2;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnD2;
+        private System.Windows.Forms.Button btnReset;
     }
 }

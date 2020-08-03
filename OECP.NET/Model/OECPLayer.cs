@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace OECP.NET.Model
 {
@@ -37,6 +38,7 @@ namespace OECP.NET.Model
 
         public List<OECPElement> Elements { get; set; } = new List<OECPElement>();
 
+        public UserControl LayerControl { get; set; }
 
         public OECPLayer(Type layerType = Type.Undefined, LineFcType lineType = LineFcType.Undefined)
         {

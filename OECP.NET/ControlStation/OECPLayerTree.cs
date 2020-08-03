@@ -20,6 +20,10 @@ namespace OECP.NET.ControlStation
         private OECPLayer _vLineLayer;
         private OECPLayer _aLineLayer;
         private OECPLayer _vertexLayer;
+        private OECPGridControlPanel _gridControl;
+
+
+        private ICanvasSignal _canvas;
 
         public enum LayerBiz
         {
@@ -31,18 +35,27 @@ namespace OECP.NET.ControlStation
             ALine = 4
         }
 
-        public OECPLayerTree()
+        public OECPLayerTree(ICanvasSignal canvas)
         {
+            _canvas = canvas;
+            InitLayers();
             InitializeComponent();
             ResizeImageList();
             FormBorderStyle = FormBorderStyle.None;
             InitTree();
-            InitLayers();
+
+            tabPageLayerControl.Controls.Add(_gridControl);
+
+            AllLayerControlInvisible();
         }
 
         private void InitLayers()
         {
-            _gridLayer = new OECPLayer(OECPLayer.Type.Grid);
+            _gridControl = new OECPGridControlPanel(_canvas);
+            _gridControl.Dock = DockStyle.Fill;
+            _gridLayer = new OECPLayer(OECPLayer.Type.Grid) {LayerControl = _gridControl};
+
+
             _mLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.M);
             _vLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.V);
             _aLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.Aux);
@@ -62,7 +75,7 @@ namespace OECP.NET.ControlStation
 
         private void InitNodes()
         {
-            var root = new TreeNode("画布图层", 5, 5) { Checked = true };
+            var root = new TreeNode("画布图层", 5, 5) {Checked = true, Tag = (int) LayerBiz.Undefined};
             root.Nodes.AddRange(InitChildNodes());
             layerTree.Nodes.Add(root);
             ChildNodeActAsParent(root);
@@ -119,9 +132,27 @@ namespace OECP.NET.ControlStation
                 case LayerBiz.Vertex:
                     action(checkState, _vertexLayer);
                     break;
+                default:
+                    return;
             }
 
         }
+
+        private void LayerChangeEvent(bool checkState,OECPLayer layer)
+        {
+            AllLayerControlInvisible();
+            if (layer.IsVisible)
+                if(layer.LayerControl != null)
+                    layer.LayerControl.Visible = true;
+        }
+
+
+        private void AllLayerControlInvisible()
+        {
+            _gridControl.Visible = false;
+
+        }
+
 
         private void LayerVisControl(bool visible, OECPLayer layer)
         {
@@ -146,8 +177,10 @@ namespace OECP.NET.ControlStation
             if (node.Nodes.Count == 0)
                 return;
             bool state = node.Checked;
+            LayerProcess(node, state, LayerVisControl);
             foreach (TreeNode child in node.Nodes)
             {
+                LayerProcess(child, state, LayerVisControl);
                 child.ForeColor = !state ? Color.Gray : DefaultForeColor;
                 child.Checked = state;
             }
@@ -155,7 +188,7 @@ namespace OECP.NET.ControlStation
 
         private void layerTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            //todo:选择后加载相应类型的工作台
+            LayerProcess(e.Node,e.Node.Checked, LayerChangeEvent);
         }
 
 
