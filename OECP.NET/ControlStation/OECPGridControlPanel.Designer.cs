@@ -38,16 +38,23 @@
             // 
             // nudGridNum
             // 
-            this.nudGridNum.Location = new System.Drawing.Point(100, 24);
+            this.nudGridNum.AutoSize = true;
+            this.nudGridNum.Location = new System.Drawing.Point(93, 23);
+            this.nudGridNum.Maximum = new decimal(new int[] {
+            256,
+            0,
+            0,
+            0});
             this.nudGridNum.Name = "nudGridNum";
-            this.nudGridNum.Size = new System.Drawing.Size(116, 21);
+            this.nudGridNum.Size = new System.Drawing.Size(135, 21);
             this.nudGridNum.TabIndex = 0;
             this.nudGridNum.ValueChanged += new System.EventHandler(this.nudGridNum_ValueChanged);
             // 
             // lblGridNum
             // 
             this.lblGridNum.AutoSize = true;
-            this.lblGridNum.Location = new System.Drawing.Point(15, 26);
+            this.lblGridNum.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.lblGridNum.Location = new System.Drawing.Point(18, 26);
             this.lblGridNum.Name = "lblGridNum";
             this.lblGridNum.Size = new System.Drawing.Size(65, 12);
             this.lblGridNum.TabIndex = 1;
@@ -55,9 +62,11 @@
             // 
             // btnM2
             // 
+            this.btnM2.AutoSize = true;
+            this.btnM2.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.btnM2.Location = new System.Drawing.Point(17, 64);
             this.btnM2.Name = "btnM2";
-            this.btnM2.Size = new System.Drawing.Size(50, 23);
+            this.btnM2.Size = new System.Drawing.Size(63, 23);
             this.btnM2.TabIndex = 2;
             this.btnM2.Text = "X2";
             this.btnM2.UseVisualStyleBackColor = true;
@@ -65,9 +74,11 @@
             // 
             // btnD2
             // 
+            this.btnD2.AutoSize = true;
+            this.btnD2.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.btnD2.Location = new System.Drawing.Point(90, 64);
             this.btnD2.Name = "btnD2";
-            this.btnD2.Size = new System.Drawing.Size(50, 23);
+            this.btnD2.Size = new System.Drawing.Size(62, 23);
             this.btnD2.TabIndex = 3;
             this.btnD2.Text = "X1/2";
             this.btnD2.UseVisualStyleBackColor = true;
@@ -75,24 +86,28 @@
             // 
             // btnReset
             // 
+            this.btnReset.AutoSize = true;
+            this.btnReset.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.btnReset.Location = new System.Drawing.Point(158, 64);
             this.btnReset.Name = "btnReset";
-            this.btnReset.Size = new System.Drawing.Size(58, 23);
+            this.btnReset.Size = new System.Drawing.Size(71, 23);
             this.btnReset.TabIndex = 4;
             this.btnReset.Text = "重置";
             this.btnReset.UseVisualStyleBackColor = true;
+            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
             // 
             // OECPGridControlPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.Controls.Add(this.btnReset);
             this.Controls.Add(this.btnD2);
             this.Controls.Add(this.btnM2);
             this.Controls.Add(this.lblGridNum);
             this.Controls.Add(this.nudGridNum);
             this.Name = "OECPGridControlPanel";
-            this.Size = new System.Drawing.Size(246, 101);
+            this.Size = new System.Drawing.Size(277, 103);
             ((System.ComponentModel.ISupportInitialize)(this.nudGridNum)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

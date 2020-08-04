@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using OECP.NET.ControlStation.BaseControl;
 using OECP.NET.Model;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -20,7 +21,7 @@ namespace OECP.NET.ControlStation
         private OECPLayer _vLineLayer;
         private OECPLayer _aLineLayer;
         private OECPLayer _vertexLayer;
-        private OECPGridControlPanel _gridControl;
+        private OECPTabledGridControlPanel _gridControl;
 
 
         private ICanvasSignal _canvas;
@@ -40,27 +41,31 @@ namespace OECP.NET.ControlStation
             _canvas = canvas;
             InitLayers();
             InitializeComponent();
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             ResizeImageList();
-            FormBorderStyle = FormBorderStyle.None;
             InitTree();
-
-            tabPageLayerControl.Controls.Add(_gridControl);
-
+            InitLayerControlPanel();
             AllLayerControlInvisible();
         }
 
+
         private void InitLayers()
         {
-            _gridControl = new OECPGridControlPanel(_canvas);
-            _gridControl.Dock = DockStyle.Fill;
+            _gridControl = new OECPTabledGridControlPanel(_canvas) {Dock = DockStyle.Fill};
             _gridLayer = new OECPLayer(OECPLayer.Type.Grid) {LayerControl = _gridControl};
-
 
             _mLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.M);
             _vLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.V);
             _aLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.Aux);
             _vertexLayer = new OECPLayer(OECPLayer.Type.Vertex);
         }
+
+        private void InitLayerControlPanel()
+        {
+            tabPageLayerControl.Controls.Add(_gridControl);
+            //todo: 点线 类型的图层控制
+        }
+
 
 
         private void InitTree()
@@ -150,13 +155,15 @@ namespace OECP.NET.ControlStation
         private void AllLayerControlInvisible()
         {
             _gridControl.Visible = false;
-
+            //todo:记得控制其他控制器的显隐
         }
 
 
         private void LayerVisControl(bool visible, OECPLayer layer)
         {
             layer.IsVisible = visible;
+            ILayerControl il = (ILayerControl) layer.LayerControl;
+            il?.ControlLayerVisibility(visible);
         }
 
 
@@ -174,10 +181,13 @@ namespace OECP.NET.ControlStation
 
         private void ChildNodeActAsParent(TreeNode node)
         {
-            if (node.Nodes.Count == 0)
-                return;
             bool state = node.Checked;
             LayerProcess(node, state, LayerVisControl);
+            if (!state)
+            {
+                AllLayerControlInvisible();
+                layerTree.SelectedNode = null;
+            }
             foreach (TreeNode child in node.Nodes)
             {
                 LayerProcess(child, state, LayerVisControl);

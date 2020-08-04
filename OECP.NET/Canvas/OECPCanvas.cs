@@ -34,16 +34,23 @@ namespace OECP.Canvas
         /// </summary>
         private Point _movingPoint = Point.Empty;
 
-
         /// <summary>
         /// 是否开始漫游
         /// </summary>
         private bool _panStart = false;
 
+        /// <summary>
+        /// 网格是否可见
+        /// </summary>
+        private bool _gridVisible = true;
+
+
 
         public OECPCanvas()
         {
         }
+
+
         public void SetGridNum(int num)
         {
             this._gridNum = num;
@@ -141,8 +148,9 @@ namespace OECP.Canvas
 
         private void DrawGridLine(Graphics g)
         {
+            if (!_gridVisible)
+                return;
             var sideLen = _square.Width;
-
             //横线
             float step = sideLen / _gridNum;
 
@@ -176,6 +184,12 @@ namespace OECP.Canvas
         public void UpdateGrid(int gridNum)
         {
             _gridNum = gridNum;
+            Invalidate();
+        }
+
+        public void SetGridVisible(bool visible)
+        {
+            _gridVisible = visible;
             Invalidate();
         }
     }

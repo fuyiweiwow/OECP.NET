@@ -39,11 +39,11 @@ namespace OECP.NET.ControlStation
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OECPLayerTree));
             this.panel1 = new System.Windows.Forms.Panel();
             this.treeLayerImages = new System.Windows.Forms.ImageList(this.components);
-            this.tabControlExt1 = new HZH_Controls.Controls.TabControlExt();
+            this.tabControlActions = new OECP.NET.ControlStation.BaseControl.BaseTabControl(this.components);
             this.tabPageLayerControl = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.layerTree = new OECP.NET.ControlStation.BaseControl.BaseTreeView();
-            this.tabControlExt1.SuspendLayout();
+            this.tabControlActions.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -52,7 +52,7 @@ namespace OECP.NET.ControlStation
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(283, 20);
+            this.panel1.Size = new System.Drawing.Size(261, 20);
             this.panel1.TabIndex = 0;
             // 
             // treeLayerImages
@@ -66,39 +66,34 @@ namespace OECP.NET.ControlStation
             this.treeLayerImages.Images.SetKeyName(4, "simple red line.png");
             this.treeLayerImages.Images.SetKeyName(5, "layer.png");
             // 
-            // tabControlExt1
+            // tabControlActions
             // 
-            this.tabControlExt1.CloseBtnColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(85)))), ((int)(((byte)(51)))));
-            this.tabControlExt1.Controls.Add(this.tabPageLayerControl);
-            this.tabControlExt1.Controls.Add(this.tabPage2);
-            this.tabControlExt1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControlExt1.HeaderBackColor = System.Drawing.SystemColors.ButtonFace;
-            this.tabControlExt1.HeadSelectedBackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.tabControlExt1.IsShowCloseBtn = false;
-            this.tabControlExt1.ItemSize = new System.Drawing.Size(0, 30);
-            this.tabControlExt1.Location = new System.Drawing.Point(0, 204);
-            this.tabControlExt1.Name = "tabControlExt1";
-            this.tabControlExt1.SelectedIndex = 0;
-            this.tabControlExt1.Size = new System.Drawing.Size(283, 246);
-            this.tabControlExt1.TabIndex = 2;
-            this.tabControlExt1.UncloseTabIndexs = null;
+            this.tabControlActions.Controls.Add(this.tabPageLayerControl);
+            this.tabControlActions.Controls.Add(this.tabPage2);
+            this.tabControlActions.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControlActions.ItemSize = new System.Drawing.Size(0, 30);
+            this.tabControlActions.Location = new System.Drawing.Point(0, 204);
+            this.tabControlActions.Name = "tabControlActions";
+            this.tabControlActions.SelectedIndex = 0;
+            this.tabControlActions.Size = new System.Drawing.Size(261, 246);
+            this.tabControlActions.TabIndex = 2;
             // 
             // tabPageLayerControl
             // 
             this.tabPageLayerControl.ForeColor = System.Drawing.SystemColors.ControlLightLight;
-            this.tabPageLayerControl.Location = new System.Drawing.Point(4, 34);
+            this.tabPageLayerControl.Location = new System.Drawing.Point(0, 30);
+            this.tabPageLayerControl.Margin = new System.Windows.Forms.Padding(0);
             this.tabPageLayerControl.Name = "tabPageLayerControl";
-            this.tabPageLayerControl.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageLayerControl.Size = new System.Drawing.Size(275, 208);
+            this.tabPageLayerControl.Size = new System.Drawing.Size(261, 216);
             this.tabPageLayerControl.TabIndex = 0;
             this.tabPageLayerControl.Text = "图层操作";
             this.tabPageLayerControl.UseVisualStyleBackColor = true;
             // 
             // tabPage2
             // 
-            this.tabPage2.Location = new System.Drawing.Point(4, 34);
+            this.tabPage2.Location = new System.Drawing.Point(0, 30);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Size = new System.Drawing.Size(275, 208);
+            this.tabPage2.Size = new System.Drawing.Size(283, 216);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "画布检查";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -120,7 +115,7 @@ namespace OECP.NET.ControlStation
             this.layerTree.SelectedImageIndex = 0;
             this.layerTree.ShowPlusMinus = false;
             this.layerTree.ShowRootLines = false;
-            this.layerTree.Size = new System.Drawing.Size(283, 184);
+            this.layerTree.Size = new System.Drawing.Size(261, 184);
             this.layerTree.TabIndex = 1;
             this.layerTree.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.layerTree_BeforeCheck);
             this.layerTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.layerTree_AfterCheck);
@@ -132,10 +127,10 @@ namespace OECP.NET.ControlStation
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(283, 450);
+            this.ClientSize = new System.Drawing.Size(261, 450);
             this.CloseButton = false;
             this.CloseButtonVisible = false;
-            this.Controls.Add(this.tabControlExt1);
+            this.Controls.Add(this.tabControlActions);
             this.Controls.Add(this.layerTree);
             this.Controls.Add(this.panel1);
             this.DoubleBuffered = true;
@@ -143,7 +138,7 @@ namespace OECP.NET.ControlStation
             this.HideOnClose = true;
             this.Name = "OECPLayerTree";
             this.Text = "图层";
-            this.tabControlExt1.ResumeLayout(false);
+            this.tabControlActions.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -152,7 +147,7 @@ namespace OECP.NET.ControlStation
 
         private Panel panel1;
         private BaseTreeView layerTree;
-        private TabControlExt tabControlExt1;
+        private BaseTabControl tabControlActions;
         private TabPage tabPageLayerControl;
         private TabPage tabPage2;
         private ImageList treeLayerImages;
