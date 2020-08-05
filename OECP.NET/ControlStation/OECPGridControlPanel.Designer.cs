@@ -58,7 +58,7 @@
             this.lblGridNum.Name = "lblGridNum";
             this.lblGridNum.Size = new System.Drawing.Size(65, 12);
             this.lblGridNum.TabIndex = 1;
-            this.lblGridNum.Text = "输入网格数";
+            this.lblGridNum.Text = "输入等分数";
             // 
             // btnM2
             // 
@@ -66,7 +66,7 @@
             this.btnM2.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.btnM2.Location = new System.Drawing.Point(17, 64);
             this.btnM2.Name = "btnM2";
-            this.btnM2.Size = new System.Drawing.Size(63, 23);
+            this.btnM2.Size = new System.Drawing.Size(67, 23);
             this.btnM2.TabIndex = 2;
             this.btnM2.Text = "X2";
             this.btnM2.UseVisualStyleBackColor = true;
@@ -107,7 +107,8 @@
             this.Controls.Add(this.lblGridNum);
             this.Controls.Add(this.nudGridNum);
             this.Name = "OECPGridControlPanel";
-            this.Size = new System.Drawing.Size(277, 103);
+            this.Size = new System.Drawing.Size(253, 103);
+            this.Resize += new System.EventHandler(this.OECPGridControlPanel_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.nudGridNum)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

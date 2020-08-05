@@ -57,5 +57,21 @@ namespace OECP.NET.ControlStation
         {
             _canvas.SetGridVisible(visible);
         }
+
+        private void OECPGridControlPanel_Resize(object sender, EventArgs e)
+        {
+            lblGridNum.Left = this.Left + 5;
+            lblGridNum.Width = this.Width * 2 / 5;
+
+            nudGridNum.Left = lblGridNum.Right + 3;
+            nudGridNum.Width = this.Width - 13 - lblGridNum.Width;
+
+            btnM2.Left = this.Left + 5;
+            btnM2.Width = (this.Width - 16) / 3;
+            btnD2.Left = btnM2.Right + 3;
+            btnD2.Width = btnM2.Width;
+            btnReset.Left = btnD2.Right + 3;
+            btnReset.Width = btnD2.Width;
+        }
     }
 }

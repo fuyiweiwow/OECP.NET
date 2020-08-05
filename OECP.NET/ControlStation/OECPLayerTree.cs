@@ -21,7 +21,7 @@ namespace OECP.NET.ControlStation
         private OECPLayer _vLineLayer;
         private OECPLayer _aLineLayer;
         private OECPLayer _vertexLayer;
-        private OECPTabledGridControlPanel _gridControl;
+        private OECPGridControlPanel _gridControl;
 
 
         private ICanvasSignal _canvas;
@@ -51,7 +51,7 @@ namespace OECP.NET.ControlStation
 
         private void InitLayers()
         {
-            _gridControl = new OECPTabledGridControlPanel(_canvas) {Dock = DockStyle.Fill};
+            _gridControl = new OECPGridControlPanel(_canvas) {Dock = DockStyle.Fill};
             _gridLayer = new OECPLayer(OECPLayer.Type.Grid) {LayerControl = _gridControl};
 
             _mLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.M);

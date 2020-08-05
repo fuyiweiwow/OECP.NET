@@ -32,7 +32,7 @@ namespace OECP.Canvas
         /// <summary>
         /// 正在移动的鼠标位置
         /// </summary>
-        private Point _movingPoint = Point.Empty;
+        private PointF _movingPoint = Point.Empty;
 
         /// <summary>
         /// 是否开始漫游
@@ -68,6 +68,21 @@ namespace OECP.Canvas
             this.Layout += OECPCanvas_Layout;
             _square = InitSquare();
             this.BackColor = Color.White;
+            InitRightClickMenu();
+        }
+
+        private void InitRightClickMenu()
+        {
+            var menustrip = new ContextMenuStrip();
+            ToolStripItem restoreSuqarsItem = new ToolStripButton("复位");
+            restoreSuqarsItem.Click += RestoreSuqarsItem_Click;
+            menustrip.Items.Add(restoreSuqarsItem);
+            this.ContextMenuStrip = menustrip;
+        }
+
+        private void RestoreSuqarsItem_Click(object sender, EventArgs e)
+        {
+            ReInitSquarePosition();
         }
 
         private void OECPCanvas_Layout(object sender, LayoutEventArgs e)
@@ -99,8 +114,8 @@ namespace OECP.Canvas
         {
             if (_panStart)
             {
-                _movingPoint = new Point(e.Location.X - _mouseDownLocation.X,
-                    e.Location.Y - _mouseDownLocation.Y);
+                _movingPoint = new PointF(this.Left + e.Location.X - _mouseDownLocation.X,
+                    this.Top + e.Location.Y - _mouseDownLocation.Y);
                 _square.Location = _movingPoint;
                 this.Invalidate();
             }
