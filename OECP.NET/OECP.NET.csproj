@@ -85,6 +85,12 @@
     <Compile Include="ControlStation\OECPLayerTree.Designer.cs">
       <DependentUpon>OECPLayerTree.cs</DependentUpon>
     </Compile>
+    <Compile Include="ControlStation\OECPVertexControlPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlStation\OECPVertexControlPanel.Designer.cs">
+      <DependentUpon>OECPVertexControlPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="ICanvasSignal.cs" />
     <Compile Include="ILayerControl.cs" />
     <Compile Include="MainForm.cs">
@@ -103,6 +109,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ControlStation\OECPLayerTree.resx">
       <DependentUpon>OECPLayerTree.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlStation\OECPVertexControlPanel.resx">
+      <DependentUpon>OECPVertexControlPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

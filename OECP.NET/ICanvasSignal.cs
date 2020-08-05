@@ -4,5 +4,7 @@
     {
         void UpdateGrid(int gridNum);
         void SetGridVisible(bool visible);
+
+        void SetVertexVisible(bool visible);
     }
 }

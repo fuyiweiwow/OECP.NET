@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Text;
 using System.Windows.Forms;
 using OECP.NET;
@@ -44,6 +45,10 @@ namespace OECP.Canvas
         /// </summary>
         private bool _gridVisible = true;
 
+        /// <summary>
+        /// 节点是否可见
+        /// </summary>
+        private bool _vertexVisible = true;
 
 
         public OECPCanvas()
@@ -141,7 +146,40 @@ namespace OECP.Canvas
             Pen p = new Pen(Brushes.Black, 1);
             g.DrawRectangle(p, rec.X, rec.Y, rec.Width, rec.Height); 
             DrawGridLine(g);
+            DrawVertex(g);
         }
+
+        private void DrawVertex(Graphics g)
+        {
+            if (!_vertexVisible)
+                return;
+            //画正方形四周的角点
+            Pen p = new Pen(Brushes.Black, 1);
+            Brush b = new SolidBrush(Color.Black);
+            DrawCornerVertex(g);
+
+        }
+
+        private void DrawCornerVertex(Graphics g)
+        {
+            Pen p = new Pen(Brushes.Black, 1);
+            Brush b = new SolidBrush(Color.Black);
+            var textH = 5;
+            RectangleF lt = new RectangleF((float)(_square.Left - textH/2), (float)(_square.Top - textH/2), textH, textH);
+
+            DrawVertex(_square.Left, _square.Top, p, b, g);
+            DrawVertex(_square.Right, _square.Top, p, b, g);
+            DrawVertex(_square.Right, _square.Bottom, p, b, g);
+            DrawVertex(_square.Left, _square.Bottom, p, b, g);
+        }
+
+        private void DrawVertex(float x,float y, Pen p ,Brush b, Graphics g , float width = 5)
+        {
+            RectangleF lt = new RectangleF(x - width/2, y - width/2, width, width);
+            g.DrawEllipse(p, lt);
+            g.FillEllipse(b, lt);
+        }
+
 
 
         private RectangleF InitSquare()
@@ -188,9 +226,12 @@ namespace OECP.Canvas
         private void OECPCanvas_MouseWheel(object sender, MouseEventArgs e)
         {
             if (e.Delta > 0)
-                _scale = 5;
+                _scale = 10;
             else
-                _scale = -5;
+                _scale = -10;
+            RectangleF rf = new RectangleF(_square.Location, _square.Size);
+            if (e.Delta  < 0 && rf.Width <= 10)
+                return;
             _square.Inflate(_scale, _scale);
             this.Invalidate();
         }
@@ -205,6 +246,12 @@ namespace OECP.Canvas
         public void SetGridVisible(bool visible)
         {
             _gridVisible = visible;
+            Invalidate();
+        }
+
+        public void SetVertexVisible(bool visible)
+        {
+            _vertexVisible = visible;
             Invalidate();
         }
     }

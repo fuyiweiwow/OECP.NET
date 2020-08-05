@@ -22,8 +22,9 @@ namespace OECP.NET.ControlStation
         private OECPLayer _aLineLayer;
         private OECPLayer _vertexLayer;
         private OECPGridControlPanel _gridControl;
+        private OECPVertexControlPanel _vertexControl;
 
-
+        private List<UserControl> _controlList = new List<UserControl>();
         private ICanvasSignal _canvas;
 
         public enum LayerBiz
@@ -57,15 +58,17 @@ namespace OECP.NET.ControlStation
             _mLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.M);
             _vLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.V);
             _aLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.Aux);
-            _vertexLayer = new OECPLayer(OECPLayer.Type.Vertex);
+
+            _vertexControl = new OECPVertexControlPanel(_canvas) { Dock = DockStyle.Fill };
+            _vertexLayer = new OECPLayer(OECPLayer.Type.Vertex) { LayerControl = _vertexControl };
+            _controlList.AddRange(new List<UserControl>(){ _gridControl, _vertexControl });
         }
 
         private void InitLayerControlPanel()
         {
-            tabPageLayerControl.Controls.Add(_gridControl);
-            //todo: 点线 类型的图层控制
+            foreach (UserControl control in _controlList)
+                tabPageLayerControl.Controls.Add(control);
         }
-
 
 
         private void InitTree()
@@ -154,8 +157,8 @@ namespace OECP.NET.ControlStation
 
         private void AllLayerControlInvisible()
         {
-            _gridControl.Visible = false;
-            //todo:记得控制其他控制器的显隐
+            foreach (UserControl control in _controlList)
+                control.Visible = false;
         }
 
 
