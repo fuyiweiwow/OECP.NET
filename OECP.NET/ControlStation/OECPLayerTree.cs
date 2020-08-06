@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using OECP.Canvas;
 using OECP.NET.ControlStation.BaseControl;
 using OECP.NET.Model;
 using WeifenLuo.WinFormsUI.Docking;
@@ -52,16 +53,23 @@ namespace OECP.NET.ControlStation
 
         private void InitLayers()
         {
-            _gridControl = new OECPGridControlPanel(_canvas) {Dock = DockStyle.Fill};
-            _gridLayer = new OECPLayer(OECPLayer.Type.Grid) {LayerControl = _gridControl};
+            
+            _gridLayer = new OECPLayer(OECPLayer.Type.Grid);
+            _gridControl = new OECPGridControlPanel(_canvas, _gridLayer) { Dock = DockStyle.Fill };
+            _gridLayer.LayerControl = _gridControl;
 
             _mLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.M);
             _vLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.V);
             _aLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.Aux);
 
-            _vertexControl = new OECPVertexControlPanel(_canvas) { Dock = DockStyle.Fill };
-            _vertexLayer = new OECPLayer(OECPLayer.Type.Vertex) { LayerControl = _vertexControl };
+            _vertexLayer = new OECPLayer(OECPLayer.Type.Vertex);
+            _vertexControl = new OECPVertexControlPanel(_canvas, ref _vertexLayer) { Dock = DockStyle.Fill };
+            _vertexLayer.LayerControl = _vertexControl;
             _controlList.AddRange(new List<UserControl>(){ _gridControl, _vertexControl });
+
+            var trueCanvas = (OECPCanvas) _canvas;
+            trueCanvas.Layers = new List<OECPLayer>(){ _mLineLayer , _vLineLayer , _aLineLayer , _vertexLayer ,_gridLayer };
+            //todo:这里直接把指针权限给画布
         }
 
         private void InitLayerControlPanel()

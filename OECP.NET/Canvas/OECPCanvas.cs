@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Text;
 using System.Windows.Forms;
 using OECP.NET;
+using OECP.NET.Model;
 
 namespace OECP.Canvas
 {
@@ -50,11 +51,35 @@ namespace OECP.Canvas
         /// </summary>
         private bool _vertexVisible = true;
 
+        /// <summary>
+        /// 是否在手绘状态
+        /// </summary>
+        private bool _allowPaint = false;
+
+        /// <summary>
+        /// 当前操作图层
+        /// </summary>
+        private OECPLayer _curLayer;
+
+        /// <summary>
+        /// 网格图层指针
+        /// </summary>
+        private OECPLayer _gridLayer;
+
+        private enum DrawState
+        {
+            Drawing = 0,
+            EndDraw = 1,
+        }
+
+        private DrawState _drawState = DrawState.EndDraw;
+
+        public List<OECPLayer> Layers { get; set; }
+
 
         public OECPCanvas()
         {
         }
-
 
         public void SetGridNum(int num)
         {
@@ -75,6 +100,7 @@ namespace OECP.Canvas
             this.BackColor = Color.White;
             InitRightClickMenu();
         }
+
 
         private void InitRightClickMenu()
         {
@@ -128,16 +154,57 @@ namespace OECP.Canvas
 
         private void OECPCanvas_MouseDown(object sender, MouseEventArgs e)
         {
+            _mouseDownLocation = e.Location;
             if (e.Button == MouseButtons.Middle)
             {
-                _mouseDownLocation = e.Location;
                 _panStart = true;
+            }
+
+            if (_allowPaint && e.Button == MouseButtons.Left && _drawState == DrawState.EndDraw)
+            {
+                _drawState = DrawState.Drawing;
+                //开始绘画
+                switch (_curLayer.LayerType)
+                {
+                    case OECPLayer.Type.Line:
+                        break;
+                    case OECPLayer.Type.Vertex:
+                        Invalidate();
+                        break;
+                    case OECPLayer.Type.Grid:
+                        break;
+                    default:
+                        return;
+                }
+                
             }
         }
 
         private void OECPCanvas_Paint(object sender, PaintEventArgs e)
         {
             ResetSquare(_square, e.Graphics);
+            //TODO：判断点是否在载体上(边界,网格,线上)
+            if (_allowPaint && _drawState == DrawState.Drawing)
+            {
+                Pen p = new Pen(_curLayer.LayerColor);
+                switch (_curLayer.LayerType)
+                {
+                    case OECPLayer.Type.Line:
+                        break;
+                    case OECPLayer.Type.Vertex:
+                        Brush b = new SolidBrush(Color.Black);
+                        DrawVertex(_mouseDownLocation.X,_mouseDownLocation.Y,p,b,e.Graphics);
+                        //todo:这边的坐标可能在重新打印前需要做转换
+                        _curLayer.Elements.Add(new OECPVertex(_mouseDownLocation.X, _mouseDownLocation.Y));
+                        _drawState = DrawState.EndDraw;
+                        break;
+                    case OECPLayer.Type.Grid:
+                        break;
+                    default:
+                        return;
+                }
+
+            }
         }
 
         private void ResetSquare(RectangleF rec, Graphics g)
@@ -147,6 +214,9 @@ namespace OECP.Canvas
             g.DrawRectangle(p, rec.X, rec.Y, rec.Width, rec.Height); 
             DrawGridLine(g);
             DrawVertex(g);
+            //todo:绘制历史信息
+
+
         }
 
         private void DrawVertex(Graphics g)
@@ -157,7 +227,6 @@ namespace OECP.Canvas
             Pen p = new Pen(Brushes.Black, 1);
             Brush b = new SolidBrush(Color.Black);
             DrawCornerVertex(g);
-
         }
 
         private void DrawCornerVertex(Graphics g)
@@ -203,6 +272,9 @@ namespace OECP.Canvas
         {
             if (!_gridVisible)
                 return;
+
+            //_gridLayer.Elements.Clear();
+
             var sideLen = _square.Width;
             //横线
             float step = sideLen / _gridNum;
@@ -237,9 +309,10 @@ namespace OECP.Canvas
         }
 
 
-        public void UpdateGrid(int gridNum)
+        public void UpdateGrid(int gridNum,OECPLayer layer)
         {
             _gridNum = gridNum;
+            _gridLayer = layer;
             Invalidate();
         }
 
@@ -253,6 +326,28 @@ namespace OECP.Canvas
         {
             _vertexVisible = visible;
             Invalidate();
+        }
+
+        public void DrawVertex(OECPLayer layer)
+        {
+            _allowPaint = true;
+            _curLayer = layer;
+            if (_curLayer.Elements.Count == 0)
+            {
+                //无元素时添加 默认四个角,角点不参与手绘
+                var v1 = new OECPVertex(_square.Left, _square.Top, true);
+                var v2 = new OECPVertex(_square.Right, _square.Top, true);
+                var v3 = new OECPVertex(_square.Right, _square.Bottom, true);
+                var v4 = new OECPVertex(_square.Left, _square.Bottom, true);
+                _curLayer.Elements.AddRange(new List<OECPElement>() {v1, v2, v3, v4});
+            }
+
+        }
+
+        public void StopDrawing()
+        {
+            _allowPaint = false;
+            _drawState = DrawState.EndDraw;
         }
     }
 }

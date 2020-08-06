@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using OECP.NET.Model;
 
 namespace OECP.NET.ControlStation
 {
@@ -18,13 +19,15 @@ namespace OECP.NET.ControlStation
         private readonly int _maxGridNum = 256;
 
         public int MaxGridNum => _maxGridNum;
+        private OECPLayer _layer;
 
-        public OECPGridControlPanel(ICanvasSignal canvas)
+        public OECPGridControlPanel(ICanvasSignal canvas,OECPLayer layer)
         {
             InitializeComponent();
             _canvas = canvas;
             _lastProperValue = (int)nudGridNum.Value;
             this.BorderStyle = BorderStyle.None;
+            _layer = layer;
         }
 
 
@@ -44,19 +47,24 @@ namespace OECP.NET.ControlStation
             if (currentValue > _maxGridNum)
                 nudGridNum.Value = _lastProperValue;
             else
-                _canvas.UpdateGrid(currentValue);
+            {
+                _canvas.UpdateGrid(currentValue, _layer);
+                _lastProperValue = currentValue;
+            }
+               
         }
 
         private void btnReset_Click(object sender, EventArgs e)
         {
             nudGridNum.Value = 0;
-            _canvas.UpdateGrid(0);
+            _canvas.UpdateGrid(0, _layer);
         }
 
         public void ControlLayerVisibility(bool visible)
         {
             _canvas.SetGridVisible(visible);
         }
+
 
         private void OECPGridControlPanel_Resize(object sender, EventArgs e)
         {

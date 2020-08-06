@@ -28,67 +28,78 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.rdBtnAddVtx = new System.Windows.Forms.RadioButton();
-            this.rdBtnDelVtx = new System.Windows.Forms.RadioButton();
-            this.rdBtnSpare = new System.Windows.Forms.RadioButton();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OECPVertexControlPanel));
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.tsbAddVtx = new System.Windows.Forms.ToolStripButton();
+            this.tsbDelVtx = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // rdBtnAddVtx
+            // toolStrip1
             // 
-            this.rdBtnAddVtx.AutoSize = true;
-            this.rdBtnAddVtx.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.rdBtnAddVtx.Location = new System.Drawing.Point(97, 31);
-            this.rdBtnAddVtx.Name = "rdBtnAddVtx";
-            this.rdBtnAddVtx.Size = new System.Drawing.Size(71, 16);
-            this.rdBtnAddVtx.TabIndex = 0;
-            this.rdBtnAddVtx.TabStop = true;
-            this.rdBtnAddVtx.Text = "添加节点";
-            this.rdBtnAddVtx.UseVisualStyleBackColor = true;
+            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsbAddVtx,
+            this.toolStripSeparator2,
+            this.tsbDelVtx});
+            this.toolStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(498, 25);
+            this.toolStrip1.TabIndex = 3;
+            this.toolStrip1.Text = "toolStrip1";
             // 
-            // rdBtnDelVtx
+            // tsbAddVtx
             // 
-            this.rdBtnDelVtx.AutoSize = true;
-            this.rdBtnDelVtx.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.rdBtnDelVtx.Location = new System.Drawing.Point(190, 31);
-            this.rdBtnDelVtx.Name = "rdBtnDelVtx";
-            this.rdBtnDelVtx.Size = new System.Drawing.Size(71, 16);
-            this.rdBtnDelVtx.TabIndex = 1;
-            this.rdBtnDelVtx.TabStop = true;
-            this.rdBtnDelVtx.Text = "删除节点";
-            this.rdBtnDelVtx.UseVisualStyleBackColor = true;
+            this.tsbAddVtx.AutoSize = false;
+            this.tsbAddVtx.CheckOnClick = true;
+            this.tsbAddVtx.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.tsbAddVtx.Image = ((System.Drawing.Image)(resources.GetObject("tsbAddVtx.Image")));
+            this.tsbAddVtx.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.tsbAddVtx.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbAddVtx.Name = "tsbAddVtx";
+            this.tsbAddVtx.Size = new System.Drawing.Size(76, 22);
+            this.tsbAddVtx.Text = "添加节点";
+            this.tsbAddVtx.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tsbAddVtx_MouseDown);
             // 
-            // rdBtnSpare
+            // tsbDelVtx
             // 
-            this.rdBtnSpare.AutoSize = true;
-            this.rdBtnSpare.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.rdBtnSpare.Location = new System.Drawing.Point(15, 31);
-            this.rdBtnSpare.Name = "rdBtnSpare";
-            this.rdBtnSpare.Size = new System.Drawing.Size(47, 16);
-            this.rdBtnSpare.TabIndex = 2;
-            this.rdBtnSpare.TabStop = true;
-            this.rdBtnSpare.Text = "挂起";
-            this.rdBtnSpare.UseVisualStyleBackColor = true;
+            this.tsbDelVtx.AutoSize = false;
+            this.tsbDelVtx.CheckOnClick = true;
+            this.tsbDelVtx.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.tsbDelVtx.Image = ((System.Drawing.Image)(resources.GetObject("tsbDelVtx.Image")));
+            this.tsbDelVtx.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.tsbDelVtx.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbDelVtx.Name = "tsbDelVtx";
+            this.tsbDelVtx.Size = new System.Drawing.Size(76, 22);
+            this.tsbDelVtx.Text = "删除节点";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
             // OECPVertexControlPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.Controls.Add(this.rdBtnSpare);
-            this.Controls.Add(this.rdBtnDelVtx);
-            this.Controls.Add(this.rdBtnAddVtx);
+            this.Controls.Add(this.toolStrip1);
             this.Name = "OECPVertexControlPanel";
-            this.Size = new System.Drawing.Size(287, 70);
+            this.Size = new System.Drawing.Size(498, 177);
             this.Resize += new System.EventHandler(this.OECPVertexControlPanel_Resize);
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.RadioButton rdBtnAddVtx;
-        private System.Windows.Forms.RadioButton rdBtnDelVtx;
-        private System.Windows.Forms.RadioButton rdBtnSpare;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripButton tsbAddVtx;
+        private System.Windows.Forms.ToolStripButton tsbDelVtx;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
     }
 }

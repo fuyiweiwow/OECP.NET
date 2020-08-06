@@ -41,7 +41,7 @@
             this.nudGridNum.AutoSize = true;
             this.nudGridNum.Location = new System.Drawing.Point(93, 23);
             this.nudGridNum.Maximum = new decimal(new int[] {
-            256,
+            1000,
             0,
             0,
             0});

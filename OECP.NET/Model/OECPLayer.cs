@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ using System.Windows.Forms;
 
 namespace OECP.NET.Model
 {
-    class OECPLayer
+    public class OECPLayer
     {
         public enum Type
         {
@@ -25,12 +26,15 @@ namespace OECP.NET.Model
             Aux = 2,
         }
 
+        public Color LayerColor { get; set; } = Color.Black;
 
         public bool IsLocked { get; set; }
 
         public bool IsVisible { get; set; }
 
         public bool IsLine { get; set; } 
+
+        public bool IsGrid { get; set; }
 
         public Type LayerType { get; set; }
 
@@ -45,7 +49,15 @@ namespace OECP.NET.Model
             LayerType = layerType;
             LineType = lineType;
             IsLine = LayerType == Type.Line;
+            IsGrid = LayerType == Type.Grid;
         }
+
+        public void SetLayerColor(Color color)
+        {
+            LayerColor = color;
+        }
+
+        
 
     }
 }

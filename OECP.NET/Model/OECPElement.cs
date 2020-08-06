@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace OECP.NET.Model
 {
-    class OECPElement
+    public class OECPElement
     {
         public Color ElementColor { get; set; }
 
-        OECPElement(Color color)
+        public OECPElement() { }
+
+        public OECPElement(Color color)
         {
             ElementColor = color;
         }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using OECP.NET.Model;
 
 namespace OECP.NET.ControlStation
 {
@@ -14,17 +15,13 @@ namespace OECP.NET.ControlStation
     {
 
         private ICanvasSignal _canvas;
+        private OECPLayer _layer;
 
-        public OECPVertexControlPanel(ICanvasSignal canvas)
+        public OECPVertexControlPanel(ICanvasSignal canvas,ref OECPLayer layer)
         {
             _canvas = canvas;
+            _layer = layer;
             InitializeComponent();
-            this.rdBtnSpare.Appearance = Appearance.Button;
-            rdBtnSpare.Width = 40;
-            this.rdBtnAddVtx.Appearance = Appearance.Button;
-            rdBtnAddVtx.Width = 40;
-            this.rdBtnDelVtx.Appearance = Appearance.Button;
-            rdBtnDelVtx.Width = 40;
         }
 
         public void ControlLayerVisibility(bool visible)
@@ -32,14 +29,28 @@ namespace OECP.NET.ControlStation
             _canvas.SetVertexVisible(visible);
         }
 
+
         private void OECPVertexControlPanel_Resize(object sender, EventArgs e)
         {
-            rdBtnSpare.Left = this.Left + 10;
-            rdBtnSpare.Width = (this.Width - 40) / 3;
-            rdBtnAddVtx.Left = rdBtnSpare.Right + 10;
-            rdBtnAddVtx.Width = rdBtnSpare.Width;
-            rdBtnDelVtx.Left = rdBtnAddVtx.Right + 10;
-            rdBtnDelVtx.Width = rdBtnAddVtx.Width;
+            tsbAddVtx.Size = new Size((this.Width - 25) / 2, tsbAddVtx.Height);
+            tsbDelVtx.Size = tsbAddVtx.Size;
+            toolStrip1.Visible = false;
+            toolStrip1.Visible = true;
+        }
+
+        private void tsbAddVtx_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left)
+                return;
+            ToolStripButton tsb = (ToolStripButton)sender;
+            if (tsb.Checked)
+            {
+                _canvas.StopDrawing();
+            }
+            else
+            {
+                _canvas.DrawVertex(_layer);
+            }
         }
     }
 }
