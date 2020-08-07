@@ -48,7 +48,7 @@ namespace OECP.NET.ControlStation
                 nudGridNum.Value = _lastProperValue;
             else
             {
-                _canvas.UpdateGrid(currentValue, _layer);
+                _canvas.UpdateGrid(currentValue);
                 _lastProperValue = currentValue;
             }
                
@@ -57,7 +57,7 @@ namespace OECP.NET.ControlStation
         private void btnReset_Click(object sender, EventArgs e)
         {
             nudGridNum.Value = 0;
-            _canvas.UpdateGrid(0, _layer);
+            _canvas.UpdateGrid(0);
         }
 
         public void ControlLayerVisibility(bool visible)

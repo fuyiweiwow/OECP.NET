@@ -22,6 +22,11 @@ namespace OECP.Canvas
         private RectangleF _square;
 
         /// <summary>
+        /// 最初大小的正方形
+        /// </summary>
+        private RectangleF _dSquare;
+
+        /// <summary>
         /// 网格线数目
         /// </summary>
         private int _gridNum = 0;
@@ -62,9 +67,13 @@ namespace OECP.Canvas
         private OECPLayer _curLayer;
 
         /// <summary>
-        /// 网格图层指针
+        /// 图层指针
         /// </summary>
         private OECPLayer _gridLayer;
+        private OECPLayer _mLineLayer;
+        private OECPLayer _vLineLayer;
+        private OECPLayer _aLineLayer;
+        private OECPLayer _vtxLayer;
 
         private enum DrawState
         {
@@ -97,9 +106,20 @@ namespace OECP.Canvas
             this.Resize += OECPCanvas_Resize;
             this.Layout += OECPCanvas_Layout;
             _square = InitSquare();
+            _dSquare = _square;
             this.BackColor = Color.White;
             InitRightClickMenu();
         }
+
+        public void RegisterLayerPtr(OECPLayer gird, OECPLayer ml, OECPLayer vl, OECPLayer vtx, OECPLayer aux)
+        {
+            _gridLayer = gird;
+            _mLineLayer = ml;
+            _vLineLayer = vl;
+            _vtxLayer = vtx;
+            _aLineLayer = aux;
+        }
+
 
 
         private void InitRightClickMenu()
@@ -194,8 +214,7 @@ namespace OECP.Canvas
                     case OECPLayer.Type.Vertex:
                         Brush b = new SolidBrush(Color.Black);
                         DrawVertex(_mouseDownLocation.X,_mouseDownLocation.Y,p,b,e.Graphics);
-                        //todo:这边的坐标可能在重新打印前需要做转换
-                        _curLayer.Elements.Add(new OECPVertex(_mouseDownLocation.X, _mouseDownLocation.Y));
+                        _curLayer.Elements.Add(InitVertex(_mouseDownLocation.X, _mouseDownLocation.Y));
                         _drawState = DrawState.EndDraw;
                         break;
                     case OECPLayer.Type.Grid:
@@ -207,6 +226,51 @@ namespace OECP.Canvas
             }
         }
 
+        //获得初始正方形上对应的点
+        private OECPVertex InitVertex(float x,float y)
+        {
+            var w2dw1 = _square.Width / _dSquare.Width;
+            float x0, y0;
+            if (_square.Width < _dSquare.Width)
+            {
+                //缩小了
+                x0 = _dSquare.Location.X - (_square.Location.X - x) * w2dw1;
+                y0 = _dSquare.Location.Y - (_square.Location.Y - y) * w2dw1;
+            }
+            else
+            {
+                //放大
+                x0 = _dSquare.Location.X - (_square.Location.X - x) * (1 / w2dw1);
+                y0 = _dSquare.Location.Y - (_square.Location.Y - y) * (1 / w2dw1);
+            }
+            return new OECPVertex(x0, y0);
+        }
+
+
+        //将初始矩形的坐标投影到当前画布状态
+        private OECPVertex CurVertex(float x, float y)
+        {
+            var w2dw1 = _square.Width / _dSquare.Width;
+            float x0, y0;
+            if (_square.Width < _dSquare.Width)
+            {
+                //缩小了
+
+                x0 = _dSquare.Location.X - (_square.Location.X - x) * (1 / w2dw1);
+                y0 = _dSquare.Location.Y - (_square.Location.Y - y) * (1 / w2dw1);
+              
+            }
+            else
+            {
+                //放大
+                x0 = _dSquare.Location.X - (_square.Location.X - x) * w2dw1;
+                y0 = _dSquare.Location.Y - (_square.Location.Y - y) * w2dw1;
+            }
+            return new OECPVertex(x0, y0);
+        }
+
+
+
         private void ResetSquare(RectangleF rec, Graphics g)
         {
             g.Clear(Color.White);
@@ -215,7 +279,14 @@ namespace OECP.Canvas
             DrawGridLine(g);
             DrawVertex(g);
             //todo:绘制历史信息
-
+            foreach (var ele in _vtxLayer.Elements)
+            {
+                var vtx = (OECPVertex) ele;
+                if (vtx.IsCornerVertex)
+                    continue;
+                vtx = CurVertex(vtx.X, vtx.Y);
+                DrawVertex(vtx.X,vtx.Y,p,new SolidBrush(Color.Black),g);
+            }
 
         }
 
@@ -273,8 +344,6 @@ namespace OECP.Canvas
             if (!_gridVisible)
                 return;
 
-            //_gridLayer.Elements.Clear();
-
             var sideLen = _square.Width;
             //横线
             float step = sideLen / _gridNum;
@@ -309,10 +378,9 @@ namespace OECP.Canvas
         }
 
 
-        public void UpdateGrid(int gridNum,OECPLayer layer)
+        public void UpdateGrid(int gridNum)
         {
             _gridNum = gridNum;
-            _gridLayer = layer;
             Invalidate();
         }
 

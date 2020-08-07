@@ -69,7 +69,7 @@ namespace OECP.NET.ControlStation
 
             var trueCanvas = (OECPCanvas) _canvas;
             trueCanvas.Layers = new List<OECPLayer>(){ _mLineLayer , _vLineLayer , _aLineLayer , _vertexLayer ,_gridLayer };
-            //todo:这里直接把指针权限给画布
+            trueCanvas.RegisterLayerPtr(_gridLayer, _mLineLayer, _vLineLayer, _vertexLayer, _aLineLayer);
         }
 
         private void InitLayerControlPanel()
