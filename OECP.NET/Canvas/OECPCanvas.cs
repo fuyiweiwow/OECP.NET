@@ -214,7 +214,7 @@ namespace OECP.Canvas
                     case OECPLayer.Type.Vertex:
                         Brush b = new SolidBrush(Color.Black);
                         DrawVertex(_mouseDownLocation.X,_mouseDownLocation.Y,p,b,e.Graphics);
-                        _curLayer.Elements.Add(InitVertex(_mouseDownLocation.X, _mouseDownLocation.Y));
+                        _curLayer.Elements.Add(C2iVertex(_mouseDownLocation.X, _mouseDownLocation.Y));
                         _drawState = DrawState.EndDraw;
                         break;
                     case OECPLayer.Type.Grid:
@@ -227,45 +227,25 @@ namespace OECP.Canvas
         }
 
         //获得初始正方形上对应的点
-        private OECPVertex InitVertex(float x,float y)
+        private OECPVertex C2iVertex(float x,float y)
         {
             var w2dw1 = _square.Width / _dSquare.Width;
+            var cUnitVector = new PointF(_square.Location.X - x, _square.Location.Y - y);
             float x0, y0;
-            if (_square.Width < _dSquare.Width)
-            {
-                //缩小了
-                x0 = _dSquare.Location.X - (_square.Location.X - x) * w2dw1;
-                y0 = _dSquare.Location.Y - (_square.Location.Y - y) * w2dw1;
-            }
-            else
-            {
-                //放大
-                x0 = _dSquare.Location.X - (_square.Location.X - x) * (1 / w2dw1);
-                y0 = _dSquare.Location.Y - (_square.Location.Y - y) * (1 / w2dw1);
-            }
+            x0 = _dSquare.Location.X - cUnitVector.X / w2dw1;
+            y0 = _dSquare.Location.Y - cUnitVector.Y / w2dw1;
             return new OECPVertex(x0, y0);
         }
 
 
         //将初始矩形的坐标投影到当前画布状态
-        private OECPVertex CurVertex(float x, float y)
+        private OECPVertex I2CurVertex(float x, float y)
         {
             var w2dw1 = _square.Width / _dSquare.Width;
+            var cUnitVector = new PointF(_dSquare.Location.X - x, _dSquare.Location.Y - y);
             float x0, y0;
-            if (_square.Width < _dSquare.Width)
-            {
-                //缩小了
-
-                x0 = _dSquare.Location.X - (_square.Location.X - x) * (1 / w2dw1);
-                y0 = _dSquare.Location.Y - (_square.Location.Y - y) * (1 / w2dw1);
-              
-            }
-            else
-            {
-                //放大
-                x0 = _dSquare.Location.X - (_square.Location.X - x) * w2dw1;
-                y0 = _dSquare.Location.Y - (_square.Location.Y - y) * w2dw1;
-            }
+            x0 = _square.Location.X - cUnitVector.X * w2dw1;
+            y0 = _square.Location.Y - cUnitVector.Y * w2dw1;
             return new OECPVertex(x0, y0);
         }
 
@@ -284,7 +264,7 @@ namespace OECP.Canvas
                 var vtx = (OECPVertex) ele;
                 if (vtx.IsCornerVertex)
                     continue;
-                vtx = CurVertex(vtx.X, vtx.Y);
+                vtx = I2CurVertex(vtx.X, vtx.Y);
                 DrawVertex(vtx.X,vtx.Y,p,new SolidBrush(Color.Black),g);
             }
 
