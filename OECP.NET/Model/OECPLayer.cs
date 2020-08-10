@@ -57,7 +57,17 @@ namespace OECP.NET.Model
             LayerColor = color;
         }
 
-        
+        public List<OECPVertex> VertexList()
+        {
+            List < OECPVertex > ret = new List<OECPVertex>();
+            foreach (OECPElement element in Elements)
+            {
+                if (element.Type != OECPElement.ElementType.Vertex)
+                    continue;
+                ret.Add((OECPVertex)element);
+            }
+            return ret;
+        }
 
     }
 }
