@@ -32,14 +32,20 @@ namespace OECP.Canvas
         private int _gridNum = 0;
 
         /// <summary>
-        /// 鼠标按下位置
+        /// 漫游开始位置
         /// </summary>
-        private Point _mouseDownLocation = Point.Empty;
+        private PointF _panStartLocation = Point.Empty;
 
         /// <summary>
-        /// 正在移动的鼠标位置
+        /// 漫游结束位置
         /// </summary>
-        private PointF _movingPoint = Point.Empty;
+        private PointF _panEndLocation = Point.Empty;
+
+
+        /// <summary>
+        /// 上次鼠标点击位置
+        /// </summary>
+        private PointF _lastMouseDownLocation = Point.Empty;
 
         /// <summary>
         /// 是否开始漫游
@@ -166,9 +172,9 @@ namespace OECP.Canvas
         {
             if (_panStart)
             {
-                _movingPoint = new PointF(this.Left + e.Location.X - _mouseDownLocation.X,
-                    this.Top + e.Location.Y - _mouseDownLocation.Y);
-                _square.Location = _movingPoint;
+                _panEndLocation = new PointF(this.Left + e.Location.X - _panStartLocation.X,
+                    this.Top + e.Location.Y - _panStartLocation.Y);
+                _square.Location = _panEndLocation;
                 this.Invalidate();
             }
             else
@@ -184,7 +190,8 @@ namespace OECP.Canvas
 
         private void OECPCanvas_MouseDown(object sender, MouseEventArgs e)
         {
-            _mouseDownLocation = e.Location;
+            _lastMouseDownLocation = e.Location;
+            _panStartLocation = new PointF(e.Location.X - _panEndLocation.X, e.Location.Y - _panEndLocation.Y);
             if (e.Button == MouseButtons.Middle)
             {
                 _panStart = true;
@@ -223,7 +230,7 @@ namespace OECP.Canvas
                         break;
                     case OECPLayer.Type.Vertex:
                         Brush b = new SolidBrush(Color.Black);
-                        OECPVertex vtx = new OECPVertex(_mouseDownLocation.X, _mouseDownLocation.Y);
+                        OECPVertex vtx = new OECPVertex(_lastMouseDownLocation.X, _lastMouseDownLocation.Y);
                         DrawVertex(vtx.X, vtx.Y, p, b, e.Graphics);
                         var t =  C2InitVertex(vtx);
                         _curLayer.Elements.Add(t);
@@ -244,9 +251,8 @@ namespace OECP.Canvas
             var tVtx = (OECPVertex)vtx.Clone();
             var w2dw1 = _square.Width / _dSquare.Width;
             var cUnitVector = new PointF(_square.Location.X - vtx.X, _square.Location.Y - vtx.Y);
-            float x0, y0;
-            x0 = _dSquare.Location.X - cUnitVector.X / w2dw1;
-            y0 = _dSquare.Location.Y - cUnitVector.Y / w2dw1;
+            var x0 = _dSquare.Location.X - cUnitVector.X / w2dw1;
+            var y0 = _dSquare.Location.Y - cUnitVector.Y / w2dw1;
             tVtx.X = x0;
             tVtx.Y = y0;
             return tVtx;
@@ -259,9 +265,8 @@ namespace OECP.Canvas
             var t = (OECPVertex)vtx.Clone(); ;
             var w2dw1 = _square.Width / _dSquare.Width;
             var cUnitVector = new PointF(_dSquare.Location.X - vtx.X, _dSquare.Location.Y - vtx.Y);
-            float x0, y0;
-            x0 = _square.Location.X - cUnitVector.X * w2dw1;
-            y0 = _square.Location.Y - cUnitVector.Y * w2dw1;
+            var x0 = _square.Location.X - cUnitVector.X * w2dw1;
+            var y0 = _square.Location.Y - cUnitVector.Y * w2dw1;
             t.X = x0;
             t.Y = y0;
             return t;

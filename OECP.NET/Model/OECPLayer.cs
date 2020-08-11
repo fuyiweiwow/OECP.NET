@@ -52,11 +52,6 @@ namespace OECP.NET.Model
             IsGrid = LayerType == Type.Grid;
         }
 
-        public void SetLayerColor(Color color)
-        {
-            LayerColor = color;
-        }
-
 
         public OECPElement SearchForHighLight(float x,float y,float scale)
         {
