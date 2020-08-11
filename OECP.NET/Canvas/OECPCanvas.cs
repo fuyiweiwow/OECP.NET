@@ -85,6 +85,7 @@ namespace OECP.Canvas
 
         public List<OECPLayer> Layers { get; set; }
 
+        private bool _cornerInit = false;
 
         public OECPCanvas()
         {
@@ -176,7 +177,7 @@ namespace OECP.Canvas
                     return;
                 OECPVertex ivtx  = new OECPVertex(e.Location.X,e.Location.Y);
                 var t = C2InitVertex(ivtx);
-                _curLayer.SearchForHighLight(t.X, t.Y);
+                _curLayer.SearchForHighLight(t.X, t.Y,_dSquare.Width/_square.Width);
                 this.Invalidate();
             }
         }
@@ -274,18 +275,15 @@ namespace OECP.Canvas
             Pen p = new Pen(Brushes.Black, 1);
             g.DrawRectangle(p, rec.X, rec.Y, rec.Width, rec.Height);
             DrawGridLine(g);
-            //todo:绘制历史信息
-            if (_curLayer == null && _vertexVisible)
-                DrawCornerVertex(g);
+            if (!_cornerInit)
+                InitCornerVertex();
             if (_vertexVisible)
             {
                 foreach (var ele in _vtxLayer.Elements)
                 {
                     var vtx = (OECPVertex)ele;
-                    //if (vtx.IsCornerVertex)
-                    //    continue;
                     var t = I2CurVertex(vtx);
-                    if (t.IsHighLight)
+                    if (t.IsHighLight && _vtxLayer == _curLayer) 
                     {
                         p.Width = 5;
                         p.Color = t.HighLightColor;
@@ -302,17 +300,14 @@ namespace OECP.Canvas
 
         }
 
-        private void DrawCornerVertex(Graphics g)
+        private void InitCornerVertex()
         {
-            Pen p = new Pen(Brushes.Black, 1);
-            Brush b = new SolidBrush(Color.Black);
-            var textH = 5;
-            RectangleF lt = new RectangleF((float)(_square.Left - textH / 2), (float)(_square.Top - textH / 2), textH, textH);
-
-            DrawVertex(_square.Left, _square.Top, p, b, g);
-            DrawVertex(_square.Right, _square.Top, p, b, g);
-            DrawVertex(_square.Right, _square.Bottom, p, b, g);
-            DrawVertex(_square.Left, _square.Bottom, p, b, g);
+            _cornerInit = true;
+            var tl = C2InitVertex(new OECPVertex(_square.Left, _square.Top,true));
+            var tr = C2InitVertex(new OECPVertex(_square.Right, _square.Top, true));
+            var rb = C2InitVertex(new OECPVertex(_square.Right, _square.Bottom, true));
+            var lb = C2InitVertex(new OECPVertex(_square.Left, _square.Bottom, true));
+            _vtxLayer.Elements.AddRange(new List<OECPElement>(){tl,tr,rb,lb});
         }
 
         private void DrawVertex(float x, float y, Pen p, Brush b, Graphics g, float width = 5)
@@ -402,16 +397,6 @@ namespace OECP.Canvas
         {
             _allowPaint = true;
             _curLayer = layer;
-            if (_curLayer.Elements.Count == 0)
-            {
-                //无元素时添加 默认四个角,角点不参与手绘
-                var v1 = new OECPVertex(_square.Left, _square.Top, true);
-                var v2 = new OECPVertex(_square.Right, _square.Top, true);
-                var v3 = new OECPVertex(_square.Right, _square.Bottom, true);
-                var v4 = new OECPVertex(_square.Left, _square.Bottom, true);
-                _curLayer.Elements.AddRange(new List<OECPElement>() { v1, v2, v3, v4 });
-            }
-
         }
 
         public void StopDrawing()

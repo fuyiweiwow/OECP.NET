@@ -58,24 +58,25 @@ namespace OECP.NET.Model
         }
 
 
-        public bool SearchForHighLight(float x,float y)
+        public OECPElement SearchForHighLight(float x,float y,float scale)
         {
-            bool flag = false;
             bool isLine = Elements[0].Type == OECPElement.ElementType.Line;
+            OECPElement ret = null;
             foreach (OECPElement ele in Elements)
             {
                 if (isLine)
                 {
-                    return flag;
+                    return new OECPElement();
                 }
                 else
                 {
                     var vtx = (OECPVertex) ele;
-                    if (Math.Abs(vtx.X - x) <= vtx.BufferTolerance
-                        && Math.Abs(vtx.Y - y) <= vtx.BufferTolerance)
+                    var tole = scale/ vtx.BufferTolerance;
+                    if (Math.Abs(vtx.X - x) <= tole
+                        && Math.Abs(vtx.Y - y) <= tole)
                     {
-                        flag = true;
                         vtx.IsHighLight = true;
+                        ret = vtx;
                         break;
                     }
                     else
@@ -83,7 +84,7 @@ namespace OECP.NET.Model
                 }
             }
 
-            return flag;
+            return ret;
         }
 
         

@@ -15,7 +15,7 @@ namespace OECP.NET.Model
 
         public bool IsCornerVertex { get; set; }
 
-        public float BufferTolerance { get; set; } = 10;
+        public float BufferTolerance { get; set; } = 0.1F;
 
         public OECPVertex(float x, float y, bool isCorner = false)
         :base(Color.Black)
