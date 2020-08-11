@@ -25,13 +25,23 @@ namespace OECP.NET.Model
 
         public bool IsHighLight { get; set; }
 
-        public OECPElement() { }
+        public bool IsEmpty { get; set; } = false;
+
+        public OECPElement()
+        {
+            IsEmpty = true;
+        }
 
         public OECPElement(Color color)
         {
             Type = ElementType.Undefined;
             ElementColor = color;
             IsHighLight = false;
+        }
+
+        public static OECPElement Empty()
+        {
+            return new OECPElement();
         }
     }
 }

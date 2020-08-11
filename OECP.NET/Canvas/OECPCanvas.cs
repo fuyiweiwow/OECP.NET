@@ -68,9 +68,24 @@ namespace OECP.Canvas
         private bool _allowPaint = false;
 
         /// <summary>
+        /// 是否允许删除
+        /// </summary>
+        private bool _allowDelete = false;
+
+        /// <summary>
+        /// 是否正在做删除操作
+        /// </summary>
+        private bool _onDelete = false;
+
+        /// <summary>
         /// 当前操作图层
         /// </summary>
         private OECPLayer _curLayer;
+
+        /// <summary>
+        /// 上一个高亮图形
+        /// </summary>
+        private OECPElement _lastHighLight;
 
         /// <summary>
         /// 图层指针
@@ -166,10 +181,17 @@ namespace OECP.Canvas
             {
                 _panStart = false;
             }
+
+            if (_allowDelete)
+            {
+                _onDelete = false;
+            }
         }
 
         private void OECPCanvas_MouseMove(object sender, MouseEventArgs e)
         {
+            if (_allowDelete)
+                _onDelete = false;
             if (_panStart)
             {
                 _panEndLocation = new PointF(this.Left + e.Location.X - _panStartLocation.X,
@@ -183,7 +205,7 @@ namespace OECP.Canvas
                     return;
                 OECPVertex ivtx  = new OECPVertex(e.Location.X,e.Location.Y);
                 var t = C2InitVertex(ivtx);
-                _curLayer.SearchForHighLight(t.X, t.Y,_dSquare.Width/_square.Width);
+                _lastHighLight = _curLayer.SearchForHighLight(t.X, t.Y,_dSquare.Width/_square.Width);
                 this.Invalidate();
             }
         }
@@ -208,12 +230,16 @@ namespace OECP.Canvas
                     case OECPLayer.Type.Vertex:
                         Invalidate();
                         break;
-                    case OECPLayer.Type.Grid:
-                        break;
                     default:
                         return;
                 }
 
+            }
+
+            if (_allowDelete && e.Button == MouseButtons.Left)
+            {
+                _onDelete = true;
+                Invalidate();
             }
         }
 
@@ -236,13 +262,32 @@ namespace OECP.Canvas
                         _curLayer.Elements.Add(t);
                         _drawState = DrawState.EndDraw;
                         break;
-                    case OECPLayer.Type.Grid:
+                    default:
+                        return;
+                }
+            }
+
+            if (_allowDelete && _onDelete) 
+            {
+                switch (_curLayer.LayerType)
+                {
+                    case OECPLayer.Type.Line:
+                        break;
+                    case OECPLayer.Type.Vertex:
+                        if (!_lastHighLight.IsEmpty)
+                        {
+                            var selVtx = (OECPVertex)_lastHighLight;
+                            if (selVtx.IsCornerVertex)
+                                return;
+                            _curLayer.DeleteVertex(selVtx);
+                        }
+                       
                         break;
                     default:
                         return;
                 }
-
             }
+
         }
 
         //获得初始正方形上对应的点
@@ -398,7 +443,7 @@ namespace OECP.Canvas
             Invalidate();
         }
 
-        public void DrawVertex(OECPLayer layer)
+        public void StartDrawing(OECPLayer layer)
         {
             _allowPaint = true;
             _curLayer = layer;
@@ -408,6 +453,12 @@ namespace OECP.Canvas
         {
             _allowPaint = false;
             _drawState = DrawState.EndDraw;
+        }
+
+        public void DeleteMode(OECPLayer layer,bool onDelete)
+        {
+            _allowDelete = onDelete;
+            _curLayer = layer;
         }
     }
 }

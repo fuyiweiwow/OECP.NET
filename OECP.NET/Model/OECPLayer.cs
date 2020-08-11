@@ -55,8 +55,10 @@ namespace OECP.NET.Model
 
         public OECPElement SearchForHighLight(float x,float y,float scale)
         {
+            if (Elements.Count == 0)
+                return OECPElement.Empty();
             bool isLine = Elements[0].Type == OECPElement.ElementType.Line;
-            OECPElement ret = null;
+            OECPElement ret = OECPElement.Empty();
             foreach (OECPElement ele in Elements)
             {
                 if (isLine)
@@ -82,7 +84,21 @@ namespace OECP.NET.Model
             return ret;
         }
 
-        
+        public bool DeleteVertex(OECPVertex vtx)
+        {
+            if (vtx.IsEmpty)
+                return false;
+            foreach (OECPElement ele in Elements)
+            {
+                var eleVtx = (OECPVertex)ele;
+                if (eleVtx == vtx)
+                {
+                    Elements.Remove(eleVtx);
+                    return true;
+                }
+            }
+            return false;
+        }
 
     }
 }

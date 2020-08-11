@@ -49,8 +49,37 @@ namespace OECP.NET.ControlStation
             }
             else
             {
-                _canvas.DrawVertex(_layer);
+                _canvas.StartDrawing(_layer);
             }
+        }
+
+        private void tsbAddVtx_CheckStateChanged(object sender, EventArgs e)
+        {
+            ToolStripButton tsb = (ToolStripButton)sender;
+            if (tsb.Checked)
+            {
+                tsbDelVtx.Checked = false;
+                _canvas.DeleteMode(_layer, false);
+            }
+               
+        }
+
+        private void tsbDelVtx_CheckStateChanged(object sender, EventArgs e)
+        {
+            ToolStripButton tsb = (ToolStripButton)sender;
+            if (tsb.Checked)
+            {
+                tsbAddVtx.Checked = false;
+                _canvas.StopDrawing();
+            }
+        }
+
+        private void tsbDelVtx_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Left)
+                return;
+            ToolStripButton tsb = (ToolStripButton)sender;
+            _canvas.DeleteMode(_layer, !tsb.Checked);
         }
     }
 }

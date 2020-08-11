@@ -99,6 +99,7 @@
     </Compile>
     <Compile Include="Model\OECPElement.cs" />
     <Compile Include="Model\OECPLayer.cs" />
+    <Compile Include="Model\OECPLine.cs" />
     <Compile Include="Model\OECPVertex.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

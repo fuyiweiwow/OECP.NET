@@ -17,6 +17,14 @@ namespace OECP.NET.Model
 
         public float BufferTolerance { get; set; } = 0.1F;
 
+
+
+        public OECPVertex()
+        {
+            IsEmpty = true;
+        }
+
+
         public OECPVertex(float x, float y, bool isCorner = false)
         :base(Color.Black)
         {
@@ -39,7 +47,7 @@ namespace OECP.NET.Model
         public override bool Equals(object obj)
         {
             var another = (OECPVertex) obj;
-            if (another == null)
+            if (another.IsEmpty)
                 return false;
             return Math.Abs(X - another.X) < _tolerance && Math.Abs(Y - another.Y) < _tolerance;
         }
@@ -53,5 +61,8 @@ namespace OECP.NET.Model
         {
             return this.MemberwiseClone();
         }
+
+
+
     }
 }

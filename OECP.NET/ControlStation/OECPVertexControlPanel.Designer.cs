@@ -31,8 +31,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OECPVertexControlPanel));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.tsbAddVtx = new System.Windows.Forms.ToolStripButton();
-            this.tsbDelVtx = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsbDelVtx = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -61,7 +61,13 @@
             this.tsbAddVtx.Name = "tsbAddVtx";
             this.tsbAddVtx.Size = new System.Drawing.Size(76, 22);
             this.tsbAddVtx.Text = "添加节点";
+            this.tsbAddVtx.CheckStateChanged += new System.EventHandler(this.tsbAddVtx_CheckStateChanged);
             this.tsbAddVtx.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tsbAddVtx_MouseDown);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
             // tsbDelVtx
             // 
@@ -74,11 +80,8 @@
             this.tsbDelVtx.Name = "tsbDelVtx";
             this.tsbDelVtx.Size = new System.Drawing.Size(76, 22);
             this.tsbDelVtx.Text = "删除节点";
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            this.tsbDelVtx.CheckStateChanged += new System.EventHandler(this.tsbDelVtx_CheckStateChanged);
+            this.tsbDelVtx.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tsbDelVtx_MouseDown);
             // 
             // OECPVertexControlPanel
             // 

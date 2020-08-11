@@ -9,9 +9,12 @@ namespace OECP.NET
 
         void SetVertexVisible(bool visible);
 
-        void DrawVertex(OECPLayer layer);
+        void StartDrawing(OECPLayer layer);
 
         void StopDrawing();
+
+        void DeleteMode(OECPLayer layer,bool allowDelete);
+
 
     }
 }
