@@ -7,13 +7,15 @@ using System.Threading.Tasks;
 
 namespace OECP.NET.Model
 {
-    public class OECPVertex:OECPElement
+    public class OECPVertex:OECPElement,ICloneable
     {
         private static float _tolerance = 0.01F;
         public float X { get; set; }
         public float Y { get; set; }
 
         public bool IsCornerVertex { get; set; }
+
+        public float BufferTolerance { get; set; } = 10;
 
         public OECPVertex(float x, float y, bool isCorner = false)
         :base(Color.Black)
@@ -34,7 +36,22 @@ namespace OECP.NET.Model
             return Math.Abs(pt1.X - pt2.X) < _tolerance && Math.Abs(pt1.Y - pt2.Y) < _tolerance;
         }
 
-     
+        public override bool Equals(object obj)
+        {
+            var another = (OECPVertex) obj;
+            if (another == null)
+                return false;
+            return Math.Abs(X - another.X) < _tolerance && Math.Abs(Y - another.Y) < _tolerance;
+        }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
     }
 }

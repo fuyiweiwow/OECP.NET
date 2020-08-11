@@ -170,6 +170,15 @@ namespace OECP.Canvas
                 _square.Location = _movingPoint;
                 this.Invalidate();
             }
+            else
+            {
+                if (_curLayer == null)
+                    return;
+                OECPVertex ivtx  = new OECPVertex(e.Location.X,e.Location.Y);
+                var t = C2InitVertex(ivtx);
+                _curLayer.SearchForHighLight(t.X, t.Y);
+                this.Invalidate();
+            }
         }
 
         private void OECPCanvas_MouseDown(object sender, MouseEventArgs e)
@@ -196,7 +205,7 @@ namespace OECP.Canvas
                     default:
                         return;
                 }
-                
+
             }
         }
 
@@ -213,8 +222,10 @@ namespace OECP.Canvas
                         break;
                     case OECPLayer.Type.Vertex:
                         Brush b = new SolidBrush(Color.Black);
-                        DrawVertex(_mouseDownLocation.X,_mouseDownLocation.Y,p,b,e.Graphics);
-                        _curLayer.Elements.Add(C2iVertex(_mouseDownLocation.X, _mouseDownLocation.Y));
+                        OECPVertex vtx = new OECPVertex(_mouseDownLocation.X, _mouseDownLocation.Y);
+                        DrawVertex(vtx.X, vtx.Y, p, b, e.Graphics);
+                        var t =  C2InitVertex(vtx);
+                        _curLayer.Elements.Add(t);
                         _drawState = DrawState.EndDraw;
                         break;
                     case OECPLayer.Type.Grid:
@@ -227,26 +238,32 @@ namespace OECP.Canvas
         }
 
         //获得初始正方形上对应的点
-        private OECPVertex C2iVertex(float x,float y)
+        private OECPVertex C2InitVertex(OECPVertex vtx)
         {
+            var tVtx = (OECPVertex)vtx.Clone();
             var w2dw1 = _square.Width / _dSquare.Width;
-            var cUnitVector = new PointF(_square.Location.X - x, _square.Location.Y - y);
+            var cUnitVector = new PointF(_square.Location.X - vtx.X, _square.Location.Y - vtx.Y);
             float x0, y0;
             x0 = _dSquare.Location.X - cUnitVector.X / w2dw1;
             y0 = _dSquare.Location.Y - cUnitVector.Y / w2dw1;
-            return new OECPVertex(x0, y0);
+            tVtx.X = x0;
+            tVtx.Y = y0;
+            return tVtx;
         }
 
 
         //将初始矩形的坐标投影到当前画布状态
-        private OECPVertex I2CurVertex(float x, float y)
+        private OECPVertex I2CurVertex(OECPVertex vtx)
         {
+            var t = (OECPVertex)vtx.Clone(); ;
             var w2dw1 = _square.Width / _dSquare.Width;
-            var cUnitVector = new PointF(_dSquare.Location.X - x, _dSquare.Location.Y - y);
+            var cUnitVector = new PointF(_dSquare.Location.X - vtx.X, _dSquare.Location.Y - vtx.Y);
             float x0, y0;
             x0 = _square.Location.X - cUnitVector.X * w2dw1;
             y0 = _square.Location.Y - cUnitVector.Y * w2dw1;
-            return new OECPVertex(x0, y0);
+            t.X = x0;
+            t.Y = y0;
+            return t;
         }
 
 
@@ -255,29 +272,34 @@ namespace OECP.Canvas
         {
             g.Clear(Color.White);
             Pen p = new Pen(Brushes.Black, 1);
-            g.DrawRectangle(p, rec.X, rec.Y, rec.Width, rec.Height); 
+            g.DrawRectangle(p, rec.X, rec.Y, rec.Width, rec.Height);
             DrawGridLine(g);
-            DrawVertex(g);
             //todo:绘制历史信息
-            foreach (var ele in _vtxLayer.Elements)
+            if (_curLayer == null && _vertexVisible)
+                DrawCornerVertex(g);
+            if (_vertexVisible)
             {
-                var vtx = (OECPVertex) ele;
-                if (vtx.IsCornerVertex)
-                    continue;
-                vtx = I2CurVertex(vtx.X, vtx.Y);
-                DrawVertex(vtx.X,vtx.Y,p,new SolidBrush(Color.Black),g);
+                foreach (var ele in _vtxLayer.Elements)
+                {
+                    var vtx = (OECPVertex)ele;
+                    //if (vtx.IsCornerVertex)
+                    //    continue;
+                    var t = I2CurVertex(vtx);
+                    if (t.IsHighLight)
+                    {
+                        p.Width = 5;
+                        p.Color = t.HighLightColor;
+                    }
+                    else
+                    {
+                        p.Color = t.ElementColor;
+                        p.Width = 1;
+                    }
+
+                    DrawVertex(t.X, t.Y, p, new SolidBrush(p.Color), g);
+                }
             }
 
-        }
-
-        private void DrawVertex(Graphics g)
-        {
-            if (!_vertexVisible)
-                return;
-            //画正方形四周的角点
-            Pen p = new Pen(Brushes.Black, 1);
-            Brush b = new SolidBrush(Color.Black);
-            DrawCornerVertex(g);
         }
 
         private void DrawCornerVertex(Graphics g)
@@ -285,7 +307,7 @@ namespace OECP.Canvas
             Pen p = new Pen(Brushes.Black, 1);
             Brush b = new SolidBrush(Color.Black);
             var textH = 5;
-            RectangleF lt = new RectangleF((float)(_square.Left - textH/2), (float)(_square.Top - textH/2), textH, textH);
+            RectangleF lt = new RectangleF((float)(_square.Left - textH / 2), (float)(_square.Top - textH / 2), textH, textH);
 
             DrawVertex(_square.Left, _square.Top, p, b, g);
             DrawVertex(_square.Right, _square.Top, p, b, g);
@@ -293,9 +315,9 @@ namespace OECP.Canvas
             DrawVertex(_square.Left, _square.Bottom, p, b, g);
         }
 
-        private void DrawVertex(float x,float y, Pen p ,Brush b, Graphics g , float width = 5)
+        private void DrawVertex(float x, float y, Pen p, Brush b, Graphics g, float width = 5)
         {
-            RectangleF lt = new RectangleF(x - width/2, y - width/2, width, width);
+            RectangleF lt = new RectangleF(x - width / 2, y - width / 2, width, width);
             g.DrawEllipse(p, lt);
             g.FillEllipse(b, lt);
         }
@@ -308,13 +330,13 @@ namespace OECP.Canvas
             var ht = this.Parent.Height;
             var baseLength = wx > ht ? ht : wx;
             var initLength = (float)baseLength * 4 / 5;
-            
+
             var centerPoint = new PointF((float)wx / 2, (float)ht / 2);
             var slide = initLength / 2;
             var basePoint = new PointF(centerPoint.X - slide,
                 centerPoint.Y - slide);
 
-            var ret = new RectangleF(basePoint, new SizeF(initLength, initLength)); 
+            var ret = new RectangleF(basePoint, new SizeF(initLength, initLength));
             return ret;
         }
 
@@ -351,7 +373,7 @@ namespace OECP.Canvas
             else
                 _scale = -10;
             RectangleF rf = new RectangleF(_square.Location, _square.Size);
-            if (e.Delta  < 0 && rf.Width <= 10)
+            if (e.Delta < 0 && rf.Width <= 10)
                 return;
             _square.Inflate(_scale, _scale);
             this.Invalidate();
@@ -387,7 +409,7 @@ namespace OECP.Canvas
                 var v2 = new OECPVertex(_square.Right, _square.Top, true);
                 var v3 = new OECPVertex(_square.Right, _square.Bottom, true);
                 var v4 = new OECPVertex(_square.Left, _square.Bottom, true);
-                _curLayer.Elements.AddRange(new List<OECPElement>() {v1, v2, v3, v4});
+                _curLayer.Elements.AddRange(new List<OECPElement>() { v1, v2, v3, v4 });
             }
 
         }

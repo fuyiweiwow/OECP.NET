@@ -57,17 +57,36 @@ namespace OECP.NET.Model
             LayerColor = color;
         }
 
-        public List<OECPVertex> VertexList()
+
+        public bool SearchForHighLight(float x,float y)
         {
-            List < OECPVertex > ret = new List<OECPVertex>();
-            foreach (OECPElement element in Elements)
+            bool flag = false;
+            bool isLine = Elements[0].Type == OECPElement.ElementType.Line;
+            foreach (OECPElement ele in Elements)
             {
-                if (element.Type != OECPElement.ElementType.Vertex)
-                    continue;
-                ret.Add((OECPVertex)element);
+                if (isLine)
+                {
+                    return flag;
+                }
+                else
+                {
+                    var vtx = (OECPVertex) ele;
+                    if (Math.Abs(vtx.X - x) <= vtx.BufferTolerance
+                        && Math.Abs(vtx.Y - y) <= vtx.BufferTolerance)
+                    {
+                        flag = true;
+                        vtx.IsHighLight = true;
+                        break;
+                    }
+                    else
+                        vtx.IsHighLight = false;
+                }
             }
-            return ret;
+
+            return flag;
         }
+
+        
 
     }
 }
