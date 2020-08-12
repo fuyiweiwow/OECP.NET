@@ -53,16 +53,6 @@ namespace OECP.Canvas
         private bool _panStart = false;
 
         /// <summary>
-        /// 网格是否可见
-        /// </summary>
-        private bool _gridVisible = true;
-
-        /// <summary>
-        /// 节点是否可见
-        /// </summary>
-        private bool _vertexVisible = true;
-
-        /// <summary>
         /// 是否在手绘状态
         /// </summary>
         private bool _allowPaint = false;
@@ -96,6 +86,11 @@ namespace OECP.Canvas
         private OECPLayer _aLineLayer;
         private OECPLayer _vtxLayer;
 
+        private PointF _initCanvasLocation;
+
+        private Size _initCanvasSize;
+
+
         private enum DrawState
         {
             Drawing = 0,
@@ -112,11 +107,6 @@ namespace OECP.Canvas
         {
         }
 
-        public void SetGridNum(int num)
-        {
-            this._gridNum = num;
-        }
-
         public void Init()
         {
             this.DoubleBuffered = true;
@@ -131,6 +121,8 @@ namespace OECP.Canvas
             _dSquare = _square;
             this.BackColor = Color.White;
             InitRightClickMenu();
+            _initCanvasLocation = this.Parent.Location;
+            _initCanvasSize = this.Parent.Size;
         }
 
         public void RegisterLayerPtr(OECPLayer gird, OECPLayer ml, OECPLayer vl, OECPLayer vtx, OECPLayer aux)
@@ -147,13 +139,13 @@ namespace OECP.Canvas
         private void InitRightClickMenu()
         {
             var menustrip = new ContextMenuStrip();
-            ToolStripItem restoreSuqarsItem = new ToolStripButton("复位");
-            restoreSuqarsItem.Click += RestoreSuqarsItem_Click;
-            menustrip.Items.Add(restoreSuqarsItem);
+            ToolStripItem restoreSuqareItem = new ToolStripButton("复位");
+            restoreSuqareItem.Click += RestoreSuqareItem_Click;
+            menustrip.Items.Add(restoreSuqareItem);
             this.ContextMenuStrip = menustrip;
         }
 
-        private void RestoreSuqarsItem_Click(object sender, EventArgs e)
+        private void RestoreSuqareItem_Click(object sender, EventArgs e)
         {
             ReInitSquarePosition();
         }
@@ -168,6 +160,19 @@ namespace OECP.Canvas
             _square = InitSquare();
             Invalidate();
         }
+
+        private void ResizeCurrentSquare()
+        {
+            var w2dw1 = _square.Width / _initCanvasSize.Width;
+            var h2dh1 = _square.Height / _initCanvasSize.Height;
+            var cUnitVector = new PointF(_square.Location.X - _initCanvasLocation.X, _square.Location.Y - _initCanvasLocation.Y);
+            var x0 =  cUnitVector.X / w2dw1;
+            var y0 = cUnitVector.Y / h2dh1;
+
+            _square.Location = new PointF(x0, y0);
+            Invalidate();
+        }
+
 
 
         private void OECPCanvas_Resize(object sender, EventArgs e)
@@ -327,7 +332,7 @@ namespace OECP.Canvas
             DrawGridLine(g);
             if (!_cornerInit)
                 InitCornerVertex();
-            if (_vertexVisible)
+            if (_vtxLayer.IsVisible)
             {
                 foreach (var ele in _vtxLayer.Elements)
                 {
@@ -388,7 +393,7 @@ namespace OECP.Canvas
 
         private void DrawGridLine(Graphics g)
         {
-            if (!_gridVisible)
+            if (!_gridLayer.IsVisible)
                 return;
 
             var sideLen = _square.Width;
@@ -431,22 +436,16 @@ namespace OECP.Canvas
             Invalidate();
         }
 
-        public void SetGridVisible(bool visible)
+        public void SetLayerVisible(bool visible, OECPLayer layer)
         {
-            _gridVisible = visible;
+            layer.IsVisible = visible;
             Invalidate();
         }
 
-        public void SetVertexVisible(bool visible)
-        {
-            _vertexVisible = visible;
-            Invalidate();
-        }
 
-        public void StartDrawing(OECPLayer layer)
+        public void StartDrawing()
         {
             _allowPaint = true;
-            _curLayer = layer;
         }
 
         public void StopDrawing()
@@ -455,9 +454,13 @@ namespace OECP.Canvas
             _drawState = DrawState.EndDraw;
         }
 
-        public void DeleteMode(OECPLayer layer,bool onDelete)
+        public void DeleteMode(bool onDelete)
         {
             _allowDelete = onDelete;
+        }
+
+        public void ChangeCurrentLayer(OECPLayer layer)
+        {
             _curLayer = layer;
         }
     }

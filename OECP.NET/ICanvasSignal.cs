@@ -5,16 +5,15 @@ namespace OECP.NET
     public interface ICanvasSignal
     {
         void UpdateGrid(int gridNum);
-        void SetGridVisible(bool visible);
 
-        void SetVertexVisible(bool visible);
+        void SetLayerVisible(bool visible, OECPLayer layer);
 
-        void StartDrawing(OECPLayer layer);
+        void StartDrawing();
 
         void StopDrawing();
 
-        void DeleteMode(OECPLayer layer,bool allowDelete);
+        void DeleteMode(bool allowDelete);
 
-
+        void ChangeCurrentLayer(OECPLayer layer);
     }
 }

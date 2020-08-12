@@ -17,7 +17,7 @@ namespace OECP.NET.ControlStation
         private ICanvasSignal _canvas;
         private OECPLayer _layer;
 
-        public OECPVertexControlPanel(ICanvasSignal canvas,ref OECPLayer layer)
+        public OECPVertexControlPanel(ICanvasSignal canvas, OECPLayer layer)
         {
             _canvas = canvas;
             _layer = layer;
@@ -26,7 +26,7 @@ namespace OECP.NET.ControlStation
 
         public void ControlLayerVisibility(bool visible)
         {
-            _canvas.SetVertexVisible(visible);
+            _canvas.SetLayerVisible(visible,_layer);
         }
 
 
@@ -49,7 +49,7 @@ namespace OECP.NET.ControlStation
             }
             else
             {
-                _canvas.StartDrawing(_layer);
+                _canvas.StartDrawing();
             }
         }
 
@@ -59,7 +59,7 @@ namespace OECP.NET.ControlStation
             if (tsb.Checked)
             {
                 tsbDelVtx.Checked = false;
-                _canvas.DeleteMode(_layer, false);
+                _canvas.DeleteMode(false);
             }
                
         }
@@ -79,7 +79,7 @@ namespace OECP.NET.ControlStation
             if (e.Button != MouseButtons.Left)
                 return;
             ToolStripButton tsb = (ToolStripButton)sender;
-            _canvas.DeleteMode(_layer, !tsb.Checked);
+            _canvas.DeleteMode(!tsb.Checked);
         }
     }
 }

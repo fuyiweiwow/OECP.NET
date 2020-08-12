@@ -62,7 +62,7 @@ namespace OECP.NET.ControlStation
 
         public void ControlLayerVisibility(bool visible)
         {
-            _canvas.SetGridVisible(visible);
+            _canvas.SetLayerVisible(visible,_layer);
         }
 
 

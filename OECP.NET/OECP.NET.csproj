@@ -83,6 +83,12 @@
     <Compile Include="ControlStation\OECPLayerTree.Designer.cs">
       <DependentUpon>OECPLayerTree.cs</DependentUpon>
     </Compile>
+    <Compile Include="ControlStation\OECPLineControlPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlStation\OECPLineControlPanel.Designer.cs">
+      <DependentUpon>OECPLineControlPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="ControlStation\OECPVertexControlPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -109,6 +115,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ControlStation\OECPLayerTree.resx">
       <DependentUpon>OECPLayerTree.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlStation\OECPLineControlPanel.resx">
+      <DependentUpon>OECPLineControlPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ControlStation\OECPVertexControlPanel.resx">
       <DependentUpon>OECPVertexControlPanel.cs</DependentUpon>

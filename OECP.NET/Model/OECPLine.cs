@@ -6,9 +6,38 @@ using System.Threading.Tasks;
 
 namespace OECP.NET.Model
 {
-    class OECPLine:OECPElement
+    public class OECPLine:OECPElement
     {
+        public OECPVertex StartVertex { get; set; }
+        public OECPVertex EndVertex { get; set; }
 
+        public OECPLine()
+        {
+            StartVertex = (OECPVertex)Empty();
+            EndVertex = (OECPVertex)Empty();
+            IsEmpty = true;
+        }
+
+        public OECPLine(OECPVertex stVtx, OECPVertex edVtx)
+        {
+            StartVertex = stVtx;
+            EndVertex = edVtx;
+        }
+
+
+        public bool VertexOnLine(OECPVertex vtx)
+        {
+            var lxVector = EndVertex.X - StartVertex.X;
+            var lyVector = EndVertex.Y - StartVertex.Y;
+            var v2StxVector = vtx.X - StartVertex.X;
+            var v2StyVector = vtx.Y - StartVertex.Y;
+
+            //向量乘积为0则该点在线上
+            double vectorValue = lxVector * v2StyVector - v2StxVector * lyVector;
+            if (vectorValue != 0.0)
+                return false;
+            return true;
+        }
 
 
     }
