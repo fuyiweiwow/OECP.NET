@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Windows.Forms;
 using OECP.NET;
@@ -103,6 +104,7 @@ namespace OECP.Canvas
 
         private bool _cornerInit = false;
 
+
         public OECPCanvas()
         {
         }
@@ -140,19 +142,19 @@ namespace OECP.Canvas
         {
             var menustrip = new ContextMenuStrip();
             ToolStripItem restoreSuqareItem = new ToolStripButton("复位");
-            restoreSuqareItem.Click += RestoreSuqareItem_Click;
+            restoreSuqareItem.Click += RestoreSquareItem_Click;
             menustrip.Items.Add(restoreSuqareItem);
             this.ContextMenuStrip = menustrip;
         }
 
-        private void RestoreSuqareItem_Click(object sender, EventArgs e)
+        private void RestoreSquareItem_Click(object sender, EventArgs e)
         {
             ReInitSquarePosition();
         }
 
         private void OECPCanvas_Layout(object sender, LayoutEventArgs e)
         {
-            ReInitSquarePosition();
+           
         }
 
         public void ReInitSquarePosition()
@@ -163,13 +165,14 @@ namespace OECP.Canvas
 
         private void ResizeCurrentSquare()
         {
-            var w2dw1 = _square.Width / _initCanvasSize.Width;
-            var h2dh1 = _square.Height / _initCanvasSize.Height;
-            var cUnitVector = new PointF(_square.Location.X - _initCanvasLocation.X, _square.Location.Y - _initCanvasLocation.Y);
-            var x0 =  cUnitVector.X / w2dw1;
-            var y0 = cUnitVector.Y / h2dh1;
+            var wFactor = _initCanvasSize.Width / this.Parent.Width;
+            var hFactor = _initCanvasSize.Height / this.Parent.Height;
+            var sFactor = wFactor > hFactor ? hFactor : wFactor;
+            var length = _square.Width / sFactor;
+            var x0 = (this.Parent.Location.X - _initCanvasLocation.X) / wFactor * _square.Location.X;
+            var y0 = (this.Parent.Location.Y - _initCanvasLocation.Y) / wFactor * _square.Location.Y;
 
-            _square.Location = new PointF(x0, y0);
+            _square = new RectangleF(x0, y0, length, length);
             Invalidate();
         }
 
@@ -177,7 +180,7 @@ namespace OECP.Canvas
 
         private void OECPCanvas_Resize(object sender, EventArgs e)
         {
-            ReInitSquarePosition();
+          
         }
 
         private void OECPCanvas_MouseUp(object sender, MouseEventArgs e)
