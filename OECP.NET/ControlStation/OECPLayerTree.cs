@@ -57,24 +57,24 @@ namespace OECP.NET.ControlStation
         private void InitLayers()
         {
             
-            _gridLayer = new OECPLayer(OECPLayer.Type.Grid);
+            _gridLayer = new OECPLayer(Color.Gray, OECPLayer.Type.Grid);
             _gridControl = new OECPGridControlPanel(_canvas, _gridLayer) { Dock = DockStyle.Fill };
             _gridLayer.LayerControl = _gridControl;
 
-            _mLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.M);
+            _mLineLayer = new OECPLayer(Color.Red,OECPLayer.Type.Line, OECPLayer.LineFcType.M);
             _mLControl = new OECPLineControlPanel(_canvas, _mLineLayer) { Dock = DockStyle.Fill };
             _mLineLayer.LayerControl = _mLControl;
 
             
-            _vLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.V);
+            _vLineLayer = new OECPLayer(Color.Blue, OECPLayer.Type.Line, OECPLayer.LineFcType.V);
             _vLControl = new OECPLineControlPanel(_canvas, _vLineLayer) { Dock = DockStyle.Fill };
             _vLineLayer.LayerControl = _vLControl;
 
-            _aLineLayer = new OECPLayer(OECPLayer.Type.Line, OECPLayer.LineFcType.Aux);
+            _aLineLayer = new OECPLayer(Color.Gray,OECPLayer.Type.Line, OECPLayer.LineFcType.Aux);
             _aLControl = new OECPLineControlPanel(_canvas, _aLineLayer) { Dock = DockStyle.Fill };
             _aLineLayer.LayerControl = _aLControl;
 
-            _vertexLayer = new OECPLayer(OECPLayer.Type.Vertex);
+            _vertexLayer = new OECPLayer(Color.Black, OECPLayer.Type.Vertex);
             _vertexControl = new OECPVertexControlPanel(_canvas,_vertexLayer) { Dock = DockStyle.Fill };
             _vertexLayer.LayerControl = _vertexControl;
             _controlList.AddRange(new List<UserControl>(){ _gridControl, _vertexControl, _mLControl , _vLControl , _aLControl });
@@ -114,8 +114,8 @@ namespace OECP.NET.ControlStation
             var nodeGrid = new TreeNode("网格", 2, 2) { Tag = (int)LayerBiz.Grid };
             var nodeVertex = new TreeNode("节点", 0, 0) { Tag = (int)LayerBiz.Vertex };
             var nodeMountainLine = new TreeNode("山线", 4, 4) { Tag = (int)LayerBiz.MLine };
-            var nodeAuxLine = new TreeNode("辅助线", 1, 1) { Tag = (int)LayerBiz.VLine };
-            var nodeValleyLine = new TreeNode("谷线", 3, 3) { Tag = (int)LayerBiz.ALine };
+            var nodeAuxLine = new TreeNode("辅助线", 1, 1) { Tag = (int)LayerBiz.ALine };
+            var nodeValleyLine = new TreeNode("谷线", 3, 3) { Tag = (int)LayerBiz.VLine };
             return new[] { nodeGrid, nodeMountainLine, nodeValleyLine, nodeAuxLine, nodeVertex };
         }
 

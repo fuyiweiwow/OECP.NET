@@ -61,6 +61,8 @@
             this.tsbAddLine.Name = "tsbAddLine";
             this.tsbAddLine.Size = new System.Drawing.Size(76, 22);
             this.tsbAddLine.Text = "添加线";
+            this.tsbAddLine.CheckStateChanged += new System.EventHandler(this.tsbAddLine_CheckStateChanged);
+            this.tsbAddLine.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tsbAddLine_MouseDown);
             // 
             // toolStripSeparator2
             // 
@@ -78,6 +80,8 @@
             this.tsbDelLine.Name = "tsbDelLine";
             this.tsbDelLine.Size = new System.Drawing.Size(76, 22);
             this.tsbDelLine.Text = "删除线";
+            this.tsbDelLine.CheckStateChanged += new System.EventHandler(this.tsbDelLine_CheckStateChanged);
+            this.tsbDelLine.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tsbDelLine_MouseDown);
             // 
             // OECPLineControlPanel
             // 

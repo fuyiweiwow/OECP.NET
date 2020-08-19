@@ -16,12 +16,14 @@ namespace OECP.NET.Model
             StartVertex = (OECPVertex)Empty();
             EndVertex = (OECPVertex)Empty();
             IsEmpty = true;
+            Type = ElementType.Line;
         }
 
         public OECPLine(OECPVertex stVtx, OECPVertex edVtx)
         {
             StartVertex = stVtx;
             EndVertex = edVtx;
+            Type = ElementType.Line;
         }
 
 

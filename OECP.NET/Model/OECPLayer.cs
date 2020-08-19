@@ -26,7 +26,7 @@ namespace OECP.NET.Model
             Aux = 2,
         }
 
-        public Color LayerColor { get; set; } = Color.Black;
+        public Color LayerColor { get; set; }
 
         public bool IsLocked { get; set; }
 
@@ -44,12 +44,13 @@ namespace OECP.NET.Model
 
         public UserControl LayerControl { get; set; }
 
-        public OECPLayer(Type layerType = Type.Undefined, LineFcType lineType = LineFcType.Undefined)
+        public OECPLayer(Color layerColor,Type layerType = Type.Undefined, LineFcType lineType = LineFcType.Undefined)
         {
             LayerType = layerType;
             LineType = lineType;
             IsLine = LayerType == Type.Line;
             IsGrid = LayerType == Type.Grid;
+            LayerColor = layerColor;
         }
 
 
