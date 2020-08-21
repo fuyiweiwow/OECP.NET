@@ -1,0 +1,64 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace OECP.NET.CanvasTools
+{
+    public  class CanvasTool
+    {
+        public enum CanvasToolType
+        {
+            PanTool = 0,
+            DrawTool = 1,
+            DeleteTool = 2,
+        }
+
+        public enum WorkStatus
+        {
+            IsWorking = 0,
+            WorkStopped = 1,
+            Waiting = 2,
+        }
+
+        public WorkStatus Status { get; set; }
+
+        public CanvasToolType ToolType { get; set; }
+
+        public CanvasTool(CanvasToolType type = CanvasToolType.PanTool)
+        {
+            ToolType = type;
+        }
+
+        public void SetWaiting()
+        {
+            Status = WorkStatus.Waiting;
+        }
+
+        public void StopWorking()
+        {
+            Status = WorkStatus.WorkStopped;
+        }
+
+        public void SetBusy()
+        {
+            Status = WorkStatus.IsWorking;
+        }
+
+
+        public bool IsWorking()
+        {
+            return Status == WorkStatus.IsWorking;
+        }
+
+        public bool IsWaiting()
+        {
+            return Status == WorkStatus.Waiting;
+        }
+
+
+
+    }
+}

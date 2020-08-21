@@ -6,6 +6,8 @@ using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Windows.Forms;
 using OECP.NET;
+using OECP.NET.Canvas;
+using OECP.NET.CanvasTools;
 using OECP.NET.Model;
 
 namespace OECP.Canvas
@@ -33,40 +35,9 @@ namespace OECP.Canvas
         private int _gridNum = 0;
 
         /// <summary>
-        /// 漫游开始位置
-        /// </summary>
-        private PointF _panStartLocation = Point.Empty;
-
-        /// <summary>
-        /// 漫游结束位置
-        /// </summary>
-        private PointF _panEndLocation = Point.Empty;
-
-
-        /// <summary>
         /// 上次鼠标点击位置
         /// </summary>
         private PointF _lastMouseDownLocation = Point.Empty;
-
-        /// <summary>
-        /// 是否开始漫游
-        /// </summary>
-        private bool _panStart = false;
-
-        /// <summary>
-        /// 是否在手绘状态
-        /// </summary>
-        private bool _allowPaint = false;
-
-        /// <summary>
-        /// 是否允许删除
-        /// </summary>
-        private bool _allowDelete = false;
-
-        /// <summary>
-        /// 是否正在做删除操作
-        /// </summary>
-        private bool _onDelete = false;
 
         /// <summary>
         /// 当前操作图层
@@ -87,20 +58,13 @@ namespace OECP.Canvas
         private OECPLayer _aLineLayer;
         private OECPLayer _vtxLayer;
 
-        private PointF _initCanvasLocation;
-
-        private Size _initCanvasSize;
-
         private List<OECPVertex> _lineOnDraw = new List<OECPVertex>(2);
 
+        private DrawTool _drawTool;
 
-        private enum DrawState
-        {
-            Drawing = 0,
-            EndDraw = 1,
-        }
+        private PanTool _panTool;
 
-        private DrawState _drawState = DrawState.EndDraw;
+        private DeleteTool _deleteTool;
 
         public List<OECPLayer> Layers { get; set; }
 
@@ -123,12 +87,16 @@ namespace OECP.Canvas
             this.MouseUp += OECPCanvas_MouseUp;
             this.Resize += OECPCanvas_Resize;
             this.Layout += OECPCanvas_Layout;
-            _square = InitSquare();
+            _square = CanvasUtil.GetPrimeSquare(this.Parent.Width, this.Parent.Height);
             _dSquare = _square;
             this.BackColor = Color.White;
             InitRightClickMenu();
-            _initCanvasLocation = this.Parent.Location;
-            _initCanvasSize = this.Parent.Size;
+            _drawTool = new DrawTool();
+            _drawTool.StopWorking();
+            _panTool = new PanTool();
+            _panTool.StopWorking();
+            _deleteTool = new DeleteTool();
+            _deleteTool.StopWorking();
         }
 
         public void RegisterLayerPtr(OECPLayer gird, OECPLayer ml, OECPLayer vl, OECPLayer vtx, OECPLayer aux)
@@ -139,8 +107,6 @@ namespace OECP.Canvas
             _vtxLayer = vtx;
             _aLineLayer = aux;
         }
-
-
 
         private void InitRightClickMenu()
         {
@@ -163,7 +129,7 @@ namespace OECP.Canvas
 
         public void ReInitSquarePosition()
         {
-            _square = InitSquare();
+            _square = CanvasUtil.GetPrimeSquare(this.Parent.Width, this.Parent.Height);
             Invalidate();
         }
 
@@ -175,20 +141,15 @@ namespace OECP.Canvas
 
         private void OECPCanvas_MouseUp(object sender, MouseEventArgs e)
         {
-            if (_panStart)
-            {
-                _panStart = false;
-            }
-
-            if (_allowDelete)
-            {
-                _onDelete = false;
-            }
+            if (_panTool.IsWorking())
+                _panTool.StopWorking();
+            if (_deleteTool.IsWorking())
+                _deleteTool.SetWaiting();
         }
 
         private void OECPCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_drawState == DrawState.Drawing)
+            if (_drawTool.IsWorking())
             {
                 if (_lineOnDraw.Count == 1)
                 {
@@ -197,22 +158,22 @@ namespace OECP.Canvas
                 }
               
             }
-            if (_allowDelete)
-                _onDelete = false;
-            if (_panStart)
+            if (_panTool.IsWorking())
             {
-                _panEndLocation = new PointF(this.Left + e.Location.X - _panStartLocation.X,
-                    this.Top + e.Location.Y - _panStartLocation.Y);
-                _square.Location = _panEndLocation;
+                _panTool.EndPoint = new PointF(this.Left + e.Location.X - _panTool.StartPoint.X,
+                    this.Top + e.Location.Y - _panTool.StartPoint.Y);
+                _square.Location = _panTool.EndPoint;
                 this.Invalidate();
             }
-            else
+            if(_deleteTool.IsWaiting())
             {
                 if (_curLayer == null)
                     return;
-                OECPVertex ivtx  = new OECPVertex(e.Location.X,e.Location.Y);
-                var t = C2InitVertex(ivtx);
-                _lastHighLight = _curLayer.SearchForHighLight(t.X, t.Y,_dSquare.Width/_square.Width);
+                OECPVertex ivtx = new OECPVertex(e.Location.X, e.Location.Y);
+                var t = C2I(ivtx);
+                _lastHighLight = _curLayer.SearchForHighLight(t.X, t.Y, _dSquare.Width / _square.Width);
+                if(!_lastHighLight.IsEmpty)
+                    _deleteTool.SetBusy();
                 this.Invalidate();
             }
         }
@@ -220,35 +181,45 @@ namespace OECP.Canvas
         private void OECPCanvas_MouseDown(object sender, MouseEventArgs e)
         {
             _lastMouseDownLocation = e.Location;
-            _panStartLocation = new PointF(e.Location.X - _panEndLocation.X, e.Location.Y - _panEndLocation.Y);
-            if (e.Button == MouseButtons.Middle)
-            {
-                _panStart = true;
-            }
 
-            if (_allowPaint && e.Button == MouseButtons.Left)
+            MouseDownSubProcess(e);
+        }
+
+        private void MouseDownSubProcess(MouseEventArgs e)
+        {
+            switch (e.Button)
             {
-                _drawState = DrawState.Drawing;
-                this.ContextMenuStrip.Visible = false;
-                if (_curLayer.IsLine)
+                case MouseButtons.Middle:
+                    _panTool.SetBusy();
+                    _panTool.StartPoint = new PointF(e.Location.X - _panTool.EndPoint.X, e.Location.Y - _panTool.EndPoint.Y);
+                    break;
+                case MouseButtons.Left:
                 {
-                    OECPVertex lvtx = new OECPVertex(_lastMouseDownLocation.X, _lastMouseDownLocation.Y);
-                    _lineOnDraw.Add(C2InitVertex(lvtx));
+                    if (_drawTool.IsWaiting())
+                    {
+                        _drawTool.SetBusy();
+                        this.ContextMenuStrip.Visible = false;
+                        if (_curLayer.IsLine)
+                        {
+                            OECPVertex lvtx = new OECPVertex(_lastMouseDownLocation.X, _lastMouseDownLocation.Y);
+                            _lineOnDraw.Add(C2I(lvtx));
+                        }
+                        Invalidate();
+                    }
+                    if (_deleteTool.IsWaiting())
+                    {
+                        _deleteTool.SetBusy();
+                        Invalidate();
+                    }
+                    if (e.Button == MouseButtons.Right && _lineOnDraw.Count < 2 && _drawTool.IsWorking())
+                    {
+                        var tsVtx = C2I(_lineOnDraw[0]);
+                        _vtxLayer.DeleteVertex(tsVtx);
+                        _lineOnDraw.Clear();
+                    }
+
+                    break;
                 }
-                Invalidate();
-            }
-
-            if (_allowDelete && e.Button == MouseButtons.Left)
-            {
-                _onDelete = true;
-                Invalidate();
-            }
-
-            if (e.Button == MouseButtons.Right && _lineOnDraw.Count < 2 && _drawState == DrawState.Drawing)
-            {
-                var tsVtx = C2InitVertex(_lineOnDraw[0]);
-                _vtxLayer.DeleteVertex(tsVtx);
-                _lineOnDraw.Clear();
             }
         }
 
@@ -256,73 +227,89 @@ namespace OECP.Canvas
         {
             ResetSquare(_square, e.Graphics);
             //TODO：判断点是否在载体上(边界,网格,线上)
-            if (_allowPaint && _drawState == DrawState.Drawing)
-            {
-                Pen p = new Pen(_curLayer.LayerColor);
-                Brush b = new SolidBrush(Color.Black);
-                switch (_curLayer.LayerType)
-                {
-                    case OECPLayer.Type.Line:
-                        if (_lineOnDraw.Count == 1)
-                        {
-                            var tp = I2CurVertex(_lineOnDraw[0]);
-                            DrawVertex(tp.X, tp.Y, new Pen(Color.Red), new SolidBrush(Color.Red), e.Graphics);
-                            DrawLine(tp.X, tp.Y, _movingPoint.X, _movingPoint.Y, p, e.Graphics);
-                        }
-                        if (_lineOnDraw.Count == 2)
-                        {
-                            var st = C2InitVertex(_lineOnDraw[0]);
-                            _vtxLayer.Elements.Add(st);
-                            var et = C2InitVertex(_lineOnDraw[1]);
-                            DrawVertex(et.X, et.Y, p, b, e.Graphics);
-                            _vtxLayer.Elements.Add(et);
-                            var line  = new OECPLine(st,et);
-                            _curLayer.Elements.Add(line);
-                            DrawLine(_lineOnDraw[0].X, _lineOnDraw[0].Y, _lineOnDraw[1].X, _lineOnDraw[1].Y,p,e.Graphics);
-                            _lineOnDraw.Clear();
-                            this.ContextMenuStrip.Visible = true;
-                            _drawState = DrawState.EndDraw;
+            PaintWork(e.Graphics);
+            DeleteWork();
+        }
 
-                            ResetSquare(_square, e.Graphics);
-                        }
-                        break;
-                    case OECPLayer.Type.Vertex:
-                        OECPVertex vtx = new OECPVertex(_lastMouseDownLocation.X, _lastMouseDownLocation.Y);
-                        DrawVertex(vtx.X, vtx.Y, p, b, e.Graphics);
-                        var t =  C2InitVertex(vtx);
-                        _curLayer.Elements.Add(t);
-                        _drawState = DrawState.EndDraw;
-                        break;
-                    default:
-                        return;
-                }
+        private void PaintWork(Graphics g)
+        {
+            if (!_drawTool.IsWorking()) return;
+            Pen p = new Pen(_curLayer.LayerColor);
+            Brush b = new SolidBrush(Color.Black);
+            _drawTool.Pen = p;
+            _drawTool.Brush = b;
+            _drawTool.Graphics = g;
+            ImmediatePaint(g);
+        }
+
+
+        private void ImmediatePaint(Graphics g)
+        {
+            if (_curLayer.IsLine)
+                ImmediatePaintLine(g);
+            else
+                ImmediatePaintVertex();
+        }
+
+        private void ImmediatePaintLine(Graphics g)
+        {
+            if (_lineOnDraw.Count == 1)
+            {
+                var tp = I2C(_lineOnDraw[0]);
+                _drawTool.DrawShape(tp.X, tp.Y);
+                _drawTool.Pen = new Pen(Color.Red);
+                _drawTool.DrawShape(tp.X, tp.Y, _movingPoint.X, _movingPoint.Y);
+            }
+            if (_lineOnDraw.Count == 2)
+            {
+                var st = C2I(_lineOnDraw[0]);
+                _vtxLayer.Elements.Add(st);
+                var et = C2I(_lineOnDraw[1]);
+                _drawTool.DrawShape(et.X, et.Y);
+                _vtxLayer.Elements.Add(et);
+                var line = new OECPLine(st, et);
+                _curLayer.Elements.Add(line);
+                _drawTool.DrawShape(_lineOnDraw[0].X, _lineOnDraw[0].Y, _lineOnDraw[1].X, _lineOnDraw[1].Y);
+                _lineOnDraw.Clear();
+                this.ContextMenuStrip.Visible = true;
+                _drawTool.SetWaiting();
+                ResetSquare(_square, g);
             }
 
-            if (_allowDelete && _onDelete) 
+        }
+
+        private void ImmediatePaintVertex()
+        {
+            OECPVertex vtx = new OECPVertex(_lastMouseDownLocation.X, _lastMouseDownLocation.Y);
+            _drawTool.DrawShape(vtx.X, vtx.Y);
+            var t = C2I(vtx);
+            _curLayer.Elements.Add(t);
+            _drawTool.SetWaiting();
+        }
+
+
+        private void DeleteWork()
+        {
+            if (!_deleteTool.IsWorking())
+                return;
+            if (_curLayer.IsLine)
             {
-                switch (_curLayer.LayerType)
-                {
-                    case OECPLayer.Type.Line:
-                        break;
-                    case OECPLayer.Type.Vertex:
-                        if (!_lastHighLight.IsEmpty)
-                        {
-                            var selVtx = (OECPVertex)_lastHighLight;
-                            if (selVtx.IsCornerVertex)
-                                return;
-                            _curLayer.DeleteVertex(selVtx);
-                        }
-                       
-                        break;
-                    default:
-                        return;
-                }
+
+            }
+            else
+            {
+                if(_lastHighLight == null) return;
+                if (_lastHighLight.IsEmpty) return;
+                var selVtx = (OECPVertex)_lastHighLight;
+                if (selVtx.IsCornerVertex)
+                    return;
+                _curLayer.DeleteVertex(selVtx);
             }
 
         }
 
         //获得初始正方形上对应的点
-        private OECPVertex C2InitVertex(OECPVertex vtx)
+        private OECPVertex C2I(OECPVertex vtx)
         {
             var tVtx = (OECPVertex)vtx.Clone();
             var w2dw1 = _square.Width / _dSquare.Width;
@@ -334,9 +321,8 @@ namespace OECP.Canvas
             return tVtx;
         }
 
-
         //将初始矩形的坐标投影到当前画布状态
-        private OECPVertex I2CurVertex(OECPVertex vtx)
+        private OECPVertex I2C(OECPVertex vtx)
         {
             var t = (OECPVertex)vtx.Clone(); ;
             var w2dw1 = _square.Width / _dSquare.Width;
@@ -348,145 +334,84 @@ namespace OECP.Canvas
             return t;
         }
 
-
-
         private void ResetSquare(RectangleF rec, Graphics g)
         {
             g.Clear(Color.White);
             Pen p = new Pen(Brushes.Black, 1);
             g.DrawRectangle(p, rec.X, rec.Y, rec.Width, rec.Height);
-            DrawGridLine(g);
+            CanvasUtil.DrawGridLine(g, _gridLayer.IsVisible, _square, _gridNum);
             if (!_cornerInit)
                 InitCornerVertex();
-            if (_vtxLayer.IsVisible)
+
+            _drawTool.Graphics = g;
+            
+            foreach (OECPLayer layer in Layers)
+                RePaintLayerElements(layer);
+        }
+
+
+        public  void RePaintLayerElements(OECPLayer layer)
+        {
+            if (!layer.IsVisible)
+                return;
+
+            Pen p = new Pen(Color.Black);
+            if (layer.IsLine)
             {
-                foreach (var ele in _vtxLayer.Elements)
-                {
-                    var vtx = (OECPVertex)ele;
-                    var t = I2CurVertex(vtx);
-                    if (t.IsHighLight && _vtxLayer == _curLayer) 
-                    {
-                        p.Width = 5;
-                        p.Color = t.HighLightColor;
-                    }
-                    else
-                    {
-                        p.Color = t.ElementColor;
-                        p.Width = 1;
-                    }
-
-                    DrawVertex(t.X, t.Y, p, new SolidBrush(p.Color), g);
-                }
+                foreach (var ele in layer.Elements)
+                    DrawLineElements(ele, p, layer);
             }
-
-            if (_mLineLayer.IsVisible)
+            else
             {
-                foreach (var ele in _mLineLayer.Elements)
-                {
-                    var line = (OECPLine)ele;
-                    var st = I2CurVertex(line.StartVertex);
-                    var ed = I2CurVertex(line.EndVertex);
-
-                    p.Color = _mLineLayer.LayerColor;
-                    DrawLine(st.X,st.Y,ed.X,ed.Y,p,g);
-                }
-
+                foreach (var ele in layer.Elements)
+                    DrawVertexElement(ele, p, layer);
             }
-            if (_vLineLayer.IsVisible)
+        }
+
+
+        private void DrawLineElements(OECPElement ele,Pen p,OECPLayer layer)
+        {
+            var line = (OECPLine)ele;
+            var st = I2C(line.StartVertex);
+            var ed = I2C(line.EndVertex);
+
+            p.Color = line.IsHighLight ? line.HighLightColor : layer.LayerColor;
+            _drawTool.Pen = p;
+            _drawTool.Brush?.Dispose();
+            _drawTool.Brush = new SolidBrush(p.Color);
+            _drawTool.DrawShape(st.X, st.Y, ed.X, ed.Y);
+        }
+
+        private void DrawVertexElement(OECPElement ele, Pen p, OECPLayer layer)
+        {
+            var vtx = (OECPVertex)ele;
+            var t = I2C(vtx);
+
+            if (t.IsHighLight)
             {
-                foreach (var ele in _vLineLayer.Elements)
-                {
-                    var line = (OECPLine)ele;
-                    var st = I2CurVertex(line.StartVertex);
-                    var ed = I2CurVertex(line.EndVertex);
-
-                    p.Color = _vLineLayer.LayerColor;
-                    DrawLine(st.X, st.Y, ed.X, ed.Y, p, g);
-                }
-
+                p.Width = 5;
+                p.Color = t.HighLightColor;
             }
-            if (_aLineLayer.IsVisible)
+            else
             {
-                foreach (var ele in _aLineLayer.Elements)
-                {
-                    var line = (OECPLine)ele;
-                    var st = I2CurVertex(line.StartVertex);
-                    var ed = I2CurVertex(line.EndVertex);
-
-                    p.Color = _aLineLayer.LayerColor;
-                    DrawLine(st.X, st.Y, ed.X, ed.Y, p, g);
-                }
-
+                p.Color = t.ElementColor;
+                p.Width = 1;
             }
-
-
+            _drawTool.Pen = p;
+            _drawTool.Brush?.Dispose();
+            _drawTool.Brush = new SolidBrush(p.Color);
+            _drawTool.DrawShape(t.X, t.Y);
         }
 
         private void InitCornerVertex()
         {
             _cornerInit = true;
-            var tl = C2InitVertex(new OECPVertex(_square.Left, _square.Top,true));
-            var tr = C2InitVertex(new OECPVertex(_square.Right, _square.Top, true));
-            var rb = C2InitVertex(new OECPVertex(_square.Right, _square.Bottom, true));
-            var lb = C2InitVertex(new OECPVertex(_square.Left, _square.Bottom, true));
+            var tl = C2I(new OECPVertex(_square.Left, _square.Top,true));
+            var tr = C2I(new OECPVertex(_square.Right, _square.Top, true));
+            var rb = C2I(new OECPVertex(_square.Right, _square.Bottom, true));
+            var lb = C2I(new OECPVertex(_square.Left, _square.Bottom, true));
             _vtxLayer.Elements.AddRange(new List<OECPElement>(){tl,tr,rb,lb});
         }
-
-        private void DrawVertex(float x, float y, Pen p, Brush b, Graphics g, float width = 5)
-        {
-            RectangleF lt = new RectangleF(x - width / 2, y - width / 2, width, width);
-            g.DrawEllipse(p, lt);
-            g.FillEllipse(b, lt);
-        }
-
-        private void DrawLine(float x1, float y1, float x2, float y2, Pen p, Graphics g)
-        {
-            g.DrawLine(p, x1, y1, x2 , y2);
-        }
-
-
-
-        private RectangleF InitSquare()
-        {
-            var wx = this.Parent.Width;
-            var ht = this.Parent.Height;
-            var baseLength = wx > ht ? ht : wx;
-            var initLength = (float)baseLength * 4 / 5;
-
-            var centerPoint = new PointF((float)wx / 2, (float)ht / 2);
-            var slide = initLength / 2;
-            var basePoint = new PointF(centerPoint.X - slide,
-                centerPoint.Y - slide);
-
-            var ret = new RectangleF(basePoint, new SizeF(initLength, initLength));
-            return ret;
-        }
-
-
-        private void DrawGridLine(Graphics g)
-        {
-            if (!_gridLayer.IsVisible)
-                return;
-
-            var sideLen = _square.Width;
-            //横线
-            float step = sideLen / _gridNum;
-
-            Pen p = new Pen(Brushes.Gray, 1);
-
-            var sqX = _square.Location.X;
-            var sqY = _square.Location.Y;
-
-            for (int i = 0; i < _gridNum; i++)
-            {
-                var dt = (i + 1) * step;
-
-                g.DrawLine(p, sqX, sqY + dt, sqX + sideLen, sqY + dt);
-
-                g.DrawLine(p, sqX + dt, sqY, sqX + dt, sqY + sideLen);
-            }
-        }
-
 
         private void OECPCanvas_MouseWheel(object sender, MouseEventArgs e)
         {
@@ -514,21 +439,22 @@ namespace OECP.Canvas
             Invalidate();
         }
 
-
         public void StartDrawing()
         {
-            _allowPaint = true;
+            _drawTool.SetWaiting(); 
         }
 
         public void StopDrawing()
         {
-            _allowPaint = false;
-            _drawState = DrawState.EndDraw;
+            _drawTool.StopWorking();
         }
 
         public void DeleteMode(bool onDelete)
         {
-            _allowDelete = onDelete;
+            if(onDelete)
+                _deleteTool.SetWaiting();
+            else
+                _deleteTool.StopWorking();
         }
 
         public void ChangeCurrentLayer(OECPLayer layer)

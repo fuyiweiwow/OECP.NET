@@ -80,7 +80,7 @@ namespace OECP.NET.ControlStation
             _controlList.AddRange(new List<UserControl>(){ _gridControl, _vertexControl, _mLControl , _vLControl , _aLControl });
 
             var trueCanvas = (OECPCanvas) _canvas;
-            trueCanvas.Layers = new List<OECPLayer>(){ _mLineLayer , _vLineLayer , _aLineLayer , _vertexLayer ,_gridLayer };
+            trueCanvas.Layers = new List<OECPLayer>(){ _mLineLayer , _vLineLayer , _aLineLayer , _vertexLayer};
             trueCanvas.RegisterLayerPtr(_gridLayer, _mLineLayer, _vLineLayer, _vertexLayer, _aLineLayer);
         }
 

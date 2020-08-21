@@ -59,6 +59,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CanvasTools\CanvasTool.cs" />
+    <Compile Include="CanvasTools\DeleteTool.cs" />
+    <Compile Include="CanvasTools\DrawTool.cs" />
+    <Compile Include="CanvasTools\PanTool.cs" />
+    <Compile Include="Canvas\CanvasUtil.cs" />
     <Compile Include="Canvas\OECPCanvas.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -160,5 +165,6 @@
     <Content Include="Images\simple blue line.png" />
     <Content Include="Images\simple red line.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
