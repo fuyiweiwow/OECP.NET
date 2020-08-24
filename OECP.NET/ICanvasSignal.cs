@@ -1,4 +1,5 @@
-﻿using OECP.NET.Model;
+﻿using System.Drawing;
+using OECP.NET.Model;
 
 namespace OECP.NET
 {
@@ -15,5 +16,18 @@ namespace OECP.NET
         void DeleteMode(bool allowDelete);
 
         void ChangeCurrentLayer(OECPLayer layer);
+
+        OECPVertex I2C(OECPVertex iVtx);
+
+        OECPVertex C2I(OECPVertex cVtx);
+
+        OECPLayer VertexLayer();
+
+        OECPLayer CurrentLayer();
+
+        void RepaintCanvas();
+
+        void FreezeRightClickMenu(bool frozen);
+
     }
 }

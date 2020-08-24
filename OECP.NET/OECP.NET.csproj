@@ -62,6 +62,9 @@
     <Compile Include="CanvasTools\CanvasTool.cs" />
     <Compile Include="CanvasTools\DeleteTool.cs" />
     <Compile Include="CanvasTools\DrawTool.cs" />
+    <Compile Include="CanvasTools\LineTool.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CanvasTools\PanTool.cs" />
     <Compile Include="Canvas\CanvasUtil.cs" />
     <Compile Include="Canvas\OECPCanvas.cs">

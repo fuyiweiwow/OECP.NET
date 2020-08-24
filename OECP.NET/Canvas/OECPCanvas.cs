@@ -14,53 +14,25 @@ namespace OECP.Canvas
 {
     class OECPCanvas : Panel, ICanvasSignal
     {
-        /// <summary>
-        /// 缩放比例
-        /// </summary>
         private int _scale;
 
-        /// <summary>
-        /// 绘画正方形
-        /// </summary>
         private RectangleF _square;
 
-        /// <summary>
-        /// 最初大小的正方形
-        /// </summary>
         private RectangleF _dSquare;
 
-        /// <summary>
-        /// 网格线数目
-        /// </summary>
         private int _gridNum = 0;
 
-        /// <summary>
-        /// 上次鼠标点击位置
-        /// </summary>
-        private PointF _lastMouseDownLocation = Point.Empty;
-
-        /// <summary>
-        /// 当前操作图层
-        /// </summary>
         private OECPLayer _curLayer;
 
-        /// <summary>
-        /// 上一个高亮图形
-        /// </summary>
         private OECPElement _lastHighLight;
 
-        /// <summary>
-        /// 图层指针
-        /// </summary>
         private OECPLayer _gridLayer;
         private OECPLayer _mLineLayer;
         private OECPLayer _vLineLayer;
         private OECPLayer _aLineLayer;
         private OECPLayer _vtxLayer;
 
-        private List<OECPVertex> _lineOnDraw = new List<OECPVertex>(2);
-
-        private DrawTool _drawTool;
+        private DrawTool _drawingTool;
 
         private PanTool _panTool;
 
@@ -70,7 +42,7 @@ namespace OECP.Canvas
 
         private bool _cornerInit = false;
 
-        private PointF _movingPoint= PointF.Empty;
+        private ContextMenuStrip _rclMenuStrip;
 
 
         public OECPCanvas()
@@ -91,8 +63,8 @@ namespace OECP.Canvas
             _dSquare = _square;
             this.BackColor = Color.White;
             InitRightClickMenu();
-            _drawTool = new DrawTool();
-            _drawTool.StopWorking();
+            _drawingTool = new DrawTool();
+            _drawingTool.StopWorking();
             _panTool = new PanTool();
             _panTool.StopWorking();
             _deleteTool = new DeleteTool();
@@ -110,11 +82,11 @@ namespace OECP.Canvas
 
         private void InitRightClickMenu()
         {
-            var menustrip = new ContextMenuStrip();
+            _rclMenuStrip = new ContextMenuStrip();
             ToolStripItem restoreSuqareItem = new ToolStripButton("复位");
             restoreSuqareItem.Click += RestoreSquareItem_Click;
-            menustrip.Items.Add(restoreSuqareItem);
-            this.ContextMenuStrip = menustrip;
+            _rclMenuStrip.Items.Add(restoreSuqareItem);
+            this.ContextMenuStrip = _rclMenuStrip;
         }
 
         private void RestoreSquareItem_Click(object sender, EventArgs e)
@@ -149,21 +121,12 @@ namespace OECP.Canvas
 
         private void OECPCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_drawTool.IsWorking())
-            {
-                if (_lineOnDraw.Count == 1)
-                {
-                    _movingPoint = e.Location;
-                    Invalidate();
-                }
-              
-            }
             if (_panTool.IsWorking())
             {
                 _panTool.EndPoint = new PointF(this.Left + e.Location.X - _panTool.StartPoint.X,
                     this.Top + e.Location.Y - _panTool.StartPoint.Y);
                 _square.Location = _panTool.EndPoint;
-                this.Invalidate();
+                
             }
             if(_deleteTool.IsWaiting())
             {
@@ -180,113 +143,20 @@ namespace OECP.Canvas
 
         private void OECPCanvas_MouseDown(object sender, MouseEventArgs e)
         {
-            _lastMouseDownLocation = e.Location;
-
-            MouseDownSubProcess(e);
-        }
-
-        private void MouseDownSubProcess(MouseEventArgs e)
-        {
-            switch (e.Button)
+            if (e.Button == MouseButtons.Right)
             {
-                case MouseButtons.Middle:
-                    _panTool.SetBusy();
-                    _panTool.StartPoint = new PointF(e.Location.X - _panTool.EndPoint.X, e.Location.Y - _panTool.EndPoint.Y);
-                    break;
-                case MouseButtons.Left:
-                {
-                    if (_drawTool.IsWaiting())
-                    {
-                        _drawTool.SetBusy();
-                        this.ContextMenuStrip.Visible = false;
-                        if (_curLayer.IsLine)
-                        {
-                            OECPVertex lvtx = new OECPVertex(_lastMouseDownLocation.X, _lastMouseDownLocation.Y);
-                            _lineOnDraw.Add(C2I(lvtx));
-                        }
-                        Invalidate();
-                    }
-                    if (_deleteTool.IsWaiting())
-                    {
-                        _deleteTool.SetBusy();
-                        Invalidate();
-                    }
-                    if (e.Button == MouseButtons.Right && _lineOnDraw.Count < 2 && _drawTool.IsWorking())
-                    {
-                        var tsVtx = C2I(_lineOnDraw[0]);
-                        _vtxLayer.DeleteVertex(tsVtx);
-                        _lineOnDraw.Clear();
-                    }
-
-                    break;
-                }
+                if (this.ContextMenuStrip == null)
+                    this.ContextMenuStrip = _rclMenuStrip;
             }
         }
+
 
         private void OECPCanvas_Paint(object sender, PaintEventArgs e)
         {
             ResetSquare(_square, e.Graphics);
             //TODO：判断点是否在载体上(边界,网格,线上)
-            PaintWork(e.Graphics);
             DeleteWork();
         }
-
-        private void PaintWork(Graphics g)
-        {
-            if (!_drawTool.IsWorking()) return;
-            Pen p = new Pen(_curLayer.LayerColor);
-            Brush b = new SolidBrush(Color.Black);
-            _drawTool.Pen = p;
-            _drawTool.Brush = b;
-            _drawTool.Graphics = g;
-            ImmediatePaint(g);
-        }
-
-
-        private void ImmediatePaint(Graphics g)
-        {
-            if (_curLayer.IsLine)
-                ImmediatePaintLine(g);
-            else
-                ImmediatePaintVertex();
-        }
-
-        private void ImmediatePaintLine(Graphics g)
-        {
-            if (_lineOnDraw.Count == 1)
-            {
-                var tp = I2C(_lineOnDraw[0]);
-                _drawTool.DrawShape(tp.X, tp.Y);
-                _drawTool.Pen = new Pen(Color.Red);
-                _drawTool.DrawShape(tp.X, tp.Y, _movingPoint.X, _movingPoint.Y);
-            }
-            if (_lineOnDraw.Count == 2)
-            {
-                var st = C2I(_lineOnDraw[0]);
-                _vtxLayer.Elements.Add(st);
-                var et = C2I(_lineOnDraw[1]);
-                _drawTool.DrawShape(et.X, et.Y);
-                _vtxLayer.Elements.Add(et);
-                var line = new OECPLine(st, et);
-                _curLayer.Elements.Add(line);
-                _drawTool.DrawShape(_lineOnDraw[0].X, _lineOnDraw[0].Y, _lineOnDraw[1].X, _lineOnDraw[1].Y);
-                _lineOnDraw.Clear();
-                this.ContextMenuStrip.Visible = true;
-                _drawTool.SetWaiting();
-                ResetSquare(_square, g);
-            }
-
-        }
-
-        private void ImmediatePaintVertex()
-        {
-            OECPVertex vtx = new OECPVertex(_lastMouseDownLocation.X, _lastMouseDownLocation.Y);
-            _drawTool.DrawShape(vtx.X, vtx.Y);
-            var t = C2I(vtx);
-            _curLayer.Elements.Add(t);
-            _drawTool.SetWaiting();
-        }
-
 
         private void DeleteWork()
         {
@@ -321,6 +191,27 @@ namespace OECP.Canvas
             return tVtx;
         }
 
+        public OECPLayer VertexLayer()
+        {
+            return _vtxLayer;
+        }
+
+        public OECPLayer CurrentLayer()
+        {
+            return _curLayer;
+        }
+
+        public void RepaintCanvas()
+        {
+            this.Invalidate();
+        }
+
+        public void FreezeRightClickMenu(bool frozen)
+        {
+            if (frozen)
+                this.ContextMenuStrip = null;
+        }
+
         //将初始矩形的坐标投影到当前画布状态
         private OECPVertex I2C(OECPVertex vtx)
         {
@@ -337,20 +228,20 @@ namespace OECP.Canvas
         private void ResetSquare(RectangleF rec, Graphics g)
         {
             g.Clear(Color.White);
+            g.SmoothingMode = SmoothingMode.HighQuality; //高质量
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality; //高像素偏移质量
             Pen p = new Pen(Brushes.Black, 1);
             g.DrawRectangle(p, rec.X, rec.Y, rec.Width, rec.Height);
             CanvasUtil.DrawGridLine(g, _gridLayer.IsVisible, _square, _gridNum);
             if (!_cornerInit)
                 InitCornerVertex();
 
-            _drawTool.Graphics = g;
-            
             foreach (OECPLayer layer in Layers)
-                RePaintLayerElements(layer);
+                RePaintLayerElements(layer,g);
         }
 
 
-        public  void RePaintLayerElements(OECPLayer layer)
+        public  void RePaintLayerElements(OECPLayer layer, Graphics g)
         {
             if (!layer.IsVisible)
                 return;
@@ -359,30 +250,27 @@ namespace OECP.Canvas
             if (layer.IsLine)
             {
                 foreach (var ele in layer.Elements)
-                    DrawLineElements(ele, p, layer);
+                    DrawLineElements(ele, p, layer, g);
             }
             else
             {
                 foreach (var ele in layer.Elements)
-                    DrawVertexElement(ele, p, layer);
+                    DrawVertexElement(ele, p, layer, g);
             }
         }
 
 
-        private void DrawLineElements(OECPElement ele,Pen p,OECPLayer layer)
+        private void DrawLineElements(OECPElement ele,Pen p,OECPLayer layer,Graphics g)
         {
             var line = (OECPLine)ele;
             var st = I2C(line.StartVertex);
             var ed = I2C(line.EndVertex);
 
             p.Color = line.IsHighLight ? line.HighLightColor : layer.LayerColor;
-            _drawTool.Pen = p;
-            _drawTool.Brush?.Dispose();
-            _drawTool.Brush = new SolidBrush(p.Color);
-            _drawTool.DrawShape(st.X, st.Y, ed.X, ed.Y);
+            DrawTool.DrawShape(st.X, st.Y, ed.X, ed.Y, p, g);
         }
 
-        private void DrawVertexElement(OECPElement ele, Pen p, OECPLayer layer)
+        private void DrawVertexElement(OECPElement ele, Pen p, OECPLayer layer, Graphics g)
         {
             var vtx = (OECPVertex)ele;
             var t = I2C(vtx);
@@ -397,10 +285,8 @@ namespace OECP.Canvas
                 p.Color = t.ElementColor;
                 p.Width = 1;
             }
-            _drawTool.Pen = p;
-            _drawTool.Brush?.Dispose();
-            _drawTool.Brush = new SolidBrush(p.Color);
-            _drawTool.DrawShape(t.X, t.Y);
+            var b = new SolidBrush(p.Color);
+            DrawTool.DrawShape(t.X, t.Y, p, b, g);
         }
 
         private void InitCornerVertex()
@@ -441,12 +327,25 @@ namespace OECP.Canvas
 
         public void StartDrawing()
         {
-            _drawTool.SetWaiting(); 
+            if (_curLayer.IsLine)
+                _drawingTool = new LineTool();
+            else
+            {
+               
+            }
+            _drawingTool.SetCanvas(this);
+            MouseMove += _drawingTool.CanvasTool_MouseMove;
+            MouseDown += _drawingTool.CanvasTool_MouseDown;
+            Paint += _drawingTool.CanvasTool_Paint;
+            _drawingTool.SetWaiting(); 
         }
 
         public void StopDrawing()
         {
-            _drawTool.StopWorking();
+            _drawingTool.StopWorking();
+            MouseMove -= _drawingTool.CanvasTool_MouseMove;
+            MouseDown -= _drawingTool.CanvasTool_MouseDown;
+            Paint -= _drawingTool.CanvasTool_Paint;
         }
 
         public void DeleteMode(bool onDelete)
@@ -460,6 +359,16 @@ namespace OECP.Canvas
         public void ChangeCurrentLayer(OECPLayer layer)
         {
             _curLayer = layer;
+        }
+
+        OECPVertex ICanvasSignal.I2C(OECPVertex iVtx)
+        {
+            return I2C(iVtx);
+        }
+
+        OECPVertex ICanvasSignal.C2I(OECPVertex cVtx)
+        {
+            return C2I(cVtx);
         }
     }
 }
