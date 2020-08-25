@@ -50,5 +50,25 @@ namespace OECP.NET.Canvas
             }
         }
 
+        public static bool VertexOnLine(OECPVertex vtx,List<OECPLayer> lineLayers, ref OECPVertex projVtx)
+        {
+            foreach (OECPLayer lineLayer in lineLayers)
+            {
+                foreach (OECPElement ele in lineLayer.Elements)
+                {
+                    var line = (OECPLine) ele;
+
+                    if (line.Distance(vtx) <= vtx.BufferTolerance)
+                    {
+                        projVtx = line.GetProjectVertex(vtx);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+
+
     }
 }

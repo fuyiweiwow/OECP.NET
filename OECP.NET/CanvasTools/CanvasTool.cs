@@ -100,5 +100,6 @@ namespace OECP.NET.CanvasTools
             return Status == WorkStatus.WorkStopped;
         }
 
+
     }
 }

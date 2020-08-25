@@ -109,10 +109,6 @@ namespace OECP.NET.CanvasTools
 
         }
 
-
-        public override void CanvasTool_MouseUp(object sender, MouseEventArgs e)
-        {
-          
-        }
+     
     }
 }

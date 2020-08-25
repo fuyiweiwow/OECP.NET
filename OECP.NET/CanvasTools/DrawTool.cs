@@ -34,6 +34,9 @@ namespace OECP.NET.CanvasTools
 
         public OECPLayer CurrentLayer()
         {
+            if (_canvas == null)
+                return null;
+
             var curLayer = _canvas.CurrentLayer();
 
             Pen = new Pen(curLayer.LayerColor);
@@ -82,6 +85,14 @@ namespace OECP.NET.CanvasTools
         {
             g.DrawLine(p, x1, y1, x2, y2);
         }
+
+        protected void DrawLocatePoint(float x, float y, Graphics g, float width = 10)
+        {
+            RectangleF lt = new RectangleF(x - width / 2, y - width / 2, width, width);
+            g.DrawRectangle(new Pen(Color.LawnGreen), lt.X, lt.Y, lt.Width, lt.Height);
+            g.FillRectangle(new SolidBrush(Color.LawnGreen), lt);
+        }
+
 
     }
 }

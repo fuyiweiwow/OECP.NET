@@ -16,17 +16,23 @@ namespace OECP.NET.ControlStation
 
         private ICanvasSignal _canvas;
         private OECPLayer _layer;
-        public OECPLineControlPanel(ICanvasSignal canvas, OECPLayer layer)
+        public OECPLineControlPanel(ICanvasSignal canvas)
         {
             _canvas = canvas;
-            _layer = layer;
             InitializeComponent();
         }
+
+        public void SetLayerUnderControl(OECPLayer layer)
+        {
+            _layer = layer;
+        }
+
 
         public void ControlLayerVisibility(bool visible)
         {
             _canvas.SetLayerVisible(visible,_layer);
         }
+
 
         private void OECPLineControlPanel_Resize(object sender, EventArgs e)
         {

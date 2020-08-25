@@ -29,5 +29,9 @@ namespace OECP.NET
 
         void FreezeRightClickMenu(bool frozen);
 
+        RectangleF GetPrimeSquare();
+
+        bool VertexOnLine(OECPVertex vtx,ref OECPVertex projVtx );
+
     }
 }

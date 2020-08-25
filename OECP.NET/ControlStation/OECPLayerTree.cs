@@ -24,9 +24,7 @@ namespace OECP.NET.ControlStation
         private OECPLayer _vertexLayer;
         private OECPGridControlPanel _gridControl;
         private OECPVertexControlPanel _vertexControl;
-        private OECPLineControlPanel _mLControl;
-        private OECPLineControlPanel _vLControl;
-        private OECPLineControlPanel _aLControl;
+        private OECPLineControlPanel _lControl;
 
         private List<UserControl> _controlList = new List<UserControl>();
         private ICanvasSignal _canvas;
@@ -61,23 +59,21 @@ namespace OECP.NET.ControlStation
             _gridControl = new OECPGridControlPanel(_canvas, _gridLayer) { Dock = DockStyle.Fill };
             _gridLayer.LayerControl = _gridControl;
 
-            _mLineLayer = new OECPLayer(Color.Red,OECPLayer.Type.Line, OECPLayer.LineFcType.M);
-            _mLControl = new OECPLineControlPanel(_canvas, _mLineLayer) { Dock = DockStyle.Fill };
-            _mLineLayer.LayerControl = _mLControl;
 
-            
+            _lControl = new OECPLineControlPanel(_canvas) { Dock = DockStyle.Fill };
+            _mLineLayer = new OECPLayer(Color.Red,OECPLayer.Type.Line, OECPLayer.LineFcType.M);
+            _mLineLayer.LayerControl = _lControl;
+
             _vLineLayer = new OECPLayer(Color.Blue, OECPLayer.Type.Line, OECPLayer.LineFcType.V);
-            _vLControl = new OECPLineControlPanel(_canvas, _vLineLayer) { Dock = DockStyle.Fill };
-            _vLineLayer.LayerControl = _vLControl;
+            _vLineLayer.LayerControl = _lControl;
 
             _aLineLayer = new OECPLayer(Color.Gray,OECPLayer.Type.Line, OECPLayer.LineFcType.Aux);
-            _aLControl = new OECPLineControlPanel(_canvas, _aLineLayer) { Dock = DockStyle.Fill };
-            _aLineLayer.LayerControl = _aLControl;
+            _aLineLayer.LayerControl = _lControl;
 
             _vertexLayer = new OECPLayer(Color.Black, OECPLayer.Type.Vertex);
             _vertexControl = new OECPVertexControlPanel(_canvas,_vertexLayer) { Dock = DockStyle.Fill };
             _vertexLayer.LayerControl = _vertexControl;
-            _controlList.AddRange(new List<UserControl>(){ _gridControl, _vertexControl, _mLControl , _vLControl , _aLControl });
+            _controlList.AddRange(new List<UserControl>(){ _gridControl, _vertexControl, _lControl });
 
             var trueCanvas = (OECPCanvas) _canvas;
             trueCanvas.Layers = new List<OECPLayer>(){ _mLineLayer , _vLineLayer , _aLineLayer , _vertexLayer};
@@ -172,6 +168,12 @@ namespace OECP.NET.ControlStation
             if (layer.IsVisible)
                 if (layer.LayerControl != null)
                 {
+                    if (layer.IsLine)
+                    {
+                        var ll = (OECPLineControlPanel)layer.LayerControl;
+                        ll.SetLayerUnderControl(layer);
+                    }
+                        
                     layer.LayerControl.Visible = true;
                     _canvas.ChangeCurrentLayer(layer);
                 }
@@ -189,6 +191,11 @@ namespace OECP.NET.ControlStation
         private void LayerVisControl(bool visible, OECPLayer layer)
         {
             layer.IsVisible = visible;
+            if (layer.IsLine)
+            {
+                var ll = (OECPLineControlPanel)layer.LayerControl;
+                ll.SetLayerUnderControl(layer);
+            }
             ILayerControl il = (ILayerControl) layer.LayerControl;
             il?.ControlLayerVisibility(visible);
         }

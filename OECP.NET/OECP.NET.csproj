@@ -66,6 +66,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CanvasTools\PanTool.cs" />
+    <Compile Include="CanvasTools\VertexTool.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Canvas\CanvasUtil.cs" />
     <Compile Include="Canvas\OECPCanvas.cs">
       <SubType>Component</SubType>

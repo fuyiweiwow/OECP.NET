@@ -29,7 +29,6 @@ namespace OECP.NET.ControlStation
             _canvas.SetLayerVisible(visible,_layer);
         }
 
-
         private void OECPVertexControlPanel_Resize(object sender, EventArgs e)
         {
             tsbAddVtx.Size = new Size((this.Width - 25) / 2, tsbAddVtx.Height);

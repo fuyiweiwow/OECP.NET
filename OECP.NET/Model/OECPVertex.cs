@@ -15,7 +15,7 @@ namespace OECP.NET.Model
 
         public bool IsCornerVertex { get; set; }
 
-        public float BufferTolerance { get; set; } = 0.1F;
+        public float BufferTolerance { get; set; } = 1F;
 
 
 
@@ -62,6 +62,11 @@ namespace OECP.NET.Model
             return this.MemberwiseClone();
         }
 
+
+        public double Distance(OECPVertex other)
+        {
+            return Math.Sqrt((X - other.X) * ((X - other.X) + (Y - other.Y) * (Y - other.Y)));
+        }
 
 
     }

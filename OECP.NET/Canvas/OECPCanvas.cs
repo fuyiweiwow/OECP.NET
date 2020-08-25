@@ -57,8 +57,6 @@ namespace OECP.Canvas
             this.MouseDown += OECPCanvas_MouseDown;
             this.MouseMove += OECPCanvas_MouseMove;
             this.MouseUp += OECPCanvas_MouseUp;
-            this.Resize += OECPCanvas_Resize;
-            this.Layout += OECPCanvas_Layout;
             _square = CanvasUtil.GetPrimeSquare(this.Parent.Width, this.Parent.Height);
             _dSquare = _square;
             this.BackColor = Color.White;
@@ -94,10 +92,6 @@ namespace OECP.Canvas
             ReInitSquarePosition();
         }
 
-        private void OECPCanvas_Layout(object sender, LayoutEventArgs e)
-        {
-           
-        }
 
         public void ReInitSquarePosition()
         {
@@ -105,11 +99,6 @@ namespace OECP.Canvas
             Invalidate();
         }
 
-
-        private void OECPCanvas_Resize(object sender, EventArgs e)
-        {
-            
-        }
 
         private void OECPCanvas_MouseUp(object sender, MouseEventArgs e)
         {
@@ -134,7 +123,7 @@ namespace OECP.Canvas
                     return;
                 OECPVertex ivtx = new OECPVertex(e.Location.X, e.Location.Y);
                 var t = C2I(ivtx);
-                _lastHighLight = _curLayer.SearchForHighLight(t.X, t.Y, _dSquare.Width / _square.Width);
+                _lastHighLight = _curLayer.SearchForHighLight(t.X, t.Y);
                 if(!_lastHighLight.IsEmpty)
                     _deleteTool.SetBusy();
                 this.Invalidate();
@@ -154,7 +143,6 @@ namespace OECP.Canvas
         private void OECPCanvas_Paint(object sender, PaintEventArgs e)
         {
             ResetSquare(_square, e.Graphics);
-            //TODO：判断点是否在载体上(边界,网格,线上)
             DeleteWork();
         }
 
@@ -210,6 +198,26 @@ namespace OECP.Canvas
         {
             if (frozen)
                 this.ContextMenuStrip = null;
+        }
+
+
+        public RectangleF GetPrimeSquare()
+        {
+            return _dSquare;
+        }
+
+        public bool VertexOnLine(OECPVertex vtx, ref OECPVertex projVtx)
+        {
+            var lst = new List<OECPLayer>();
+            foreach (OECPLayer layer in Layers)
+            {
+                if(!layer.IsLine)
+                    continue;
+                if(!layer.IsVisible)
+                    continue;
+                lst.Add(layer);
+            }
+            return CanvasUtil.VertexOnLine(vtx, lst, ref projVtx);
         }
 
         //将初始矩形的坐标投影到当前画布状态
@@ -330,9 +338,7 @@ namespace OECP.Canvas
             if (_curLayer.IsLine)
                 _drawingTool = new LineTool();
             else
-            {
-               
-            }
+                _drawingTool = new VertexTool();
             _drawingTool.SetCanvas(this);
             MouseMove += _drawingTool.CanvasTool_MouseMove;
             MouseDown += _drawingTool.CanvasTool_MouseDown;

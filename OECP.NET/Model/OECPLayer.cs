@@ -54,7 +54,7 @@ namespace OECP.NET.Model
         }
 
 
-        public OECPElement SearchForHighLight(float x,float y,float scale)
+        public OECPElement SearchForHighLight(float x,float y,bool setHighLight = true)
         {
             if (Elements.Count == 0)
                 return OECPElement.Empty();
@@ -69,11 +69,12 @@ namespace OECP.NET.Model
                 else
                 {
                     var vtx = (OECPVertex) ele;
-                    var tole = scale/ vtx.BufferTolerance;
+                    var tole = vtx.BufferTolerance;
                     if (Math.Abs(vtx.X - x) <= tole
                         && Math.Abs(vtx.Y - y) <= tole)
                     {
-                        vtx.IsHighLight = true;
+                        if(setHighLight)
+                            vtx.IsHighLight = true;
                         ret = vtx;
                         break;
                     }
