@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using OECP.NET.CanvasTools;
 
 namespace OECP.NET.Model
 {
@@ -40,9 +41,9 @@ namespace OECP.NET.Model
 
         public LineFcType LineType { get; set; }
 
-        public List<OECPElement> Elements { get; set; } = new List<OECPElement>();
+        private Dictionary<Guid,OECPElement> ElementMap { get; set; } = new Dictionary<Guid, OECPElement>();
 
-        public UserControl LayerControl { get; set; }
+        private List<OECPElement> Elements { get; set; } = new List<OECPElement>();
 
         public OECPLayer(Color layerColor,Type layerType = Type.Undefined, LineFcType lineType = LineFcType.Undefined)
         {
@@ -88,6 +89,7 @@ namespace OECP.NET.Model
 
         public bool DeleteVertex(OECPVertex vtx)
         {
+            //todo:只有孤立的节点才可以删除
             if (vtx.IsEmpty)
                 return false;
             foreach (OECPElement ele in Elements)
@@ -101,6 +103,27 @@ namespace OECP.NET.Model
             }
             return false;
         }
+
+        public void AddElement(OECPElement ele)
+        {
+            //todo:加入栈中，实现撤销重做
+            ele.Layer = this;
+            this.Elements.Add(ele);
+            this.ElementMap.Add(ele.Eid, ele);
+        }
+
+        public void AddElements(IEnumerable<OECPElement> eles)
+        {
+            foreach (OECPElement ele in eles)
+                AddElement(ele);
+        }
+
+        public List<OECPElement> LayerElements()
+        {
+            return Elements;
+        }
+        
+
 
     }
 }

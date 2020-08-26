@@ -59,9 +59,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CanvasTools\CanvasTool.cs" />
+    <Compile Include="CanvasTools\Base\CanvasTool.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CanvasTools\DeleteTool.cs" />
-    <Compile Include="CanvasTools\DrawTool.cs" />
+    <Compile Include="CanvasTools\Base\DrawTool.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CanvasTools\LineTool.cs">
       <SubType>Component</SubType>
     </Compile>

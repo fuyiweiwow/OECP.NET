@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using OECP.Canvas;
+using OECP.NET.CanvasTools;
 using OECP.NET.ControlStation.BaseControl;
 using OECP.NET.Model;
 using WeifenLuo.WinFormsUI.Docking;
@@ -28,6 +29,9 @@ namespace OECP.NET.ControlStation
 
         private List<UserControl> _controlList = new List<UserControl>();
         private ICanvasSignal _canvas;
+
+        private DrawTool _vtxTool;
+        private DrawTool _lineTool;
 
         public enum LayerBiz
         {
@@ -54,27 +58,21 @@ namespace OECP.NET.ControlStation
 
         private void InitLayers()
         {
-            
-            _gridLayer = new OECPLayer(Color.Gray, OECPLayer.Type.Grid);
-            _gridControl = new OECPGridControlPanel(_canvas, _gridLayer) { Dock = DockStyle.Fill };
-            _gridLayer.LayerControl = _gridControl;
-
-
+            _gridControl = new OECPGridControlPanel(_canvas) { Dock = DockStyle.Fill };
+            _vertexControl = new OECPVertexControlPanel(_canvas) { Dock = DockStyle.Fill };
             _lControl = new OECPLineControlPanel(_canvas) { Dock = DockStyle.Fill };
+            _controlList.AddRange(new List<UserControl>() { _gridControl, _vertexControl, _lControl });
+
+            _gridLayer = new OECPLayer(Color.Gray, OECPLayer.Type.Grid);
+           
             _mLineLayer = new OECPLayer(Color.Red,OECPLayer.Type.Line, OECPLayer.LineFcType.M);
-            _mLineLayer.LayerControl = _lControl;
 
             _vLineLayer = new OECPLayer(Color.Blue, OECPLayer.Type.Line, OECPLayer.LineFcType.V);
-            _vLineLayer.LayerControl = _lControl;
 
             _aLineLayer = new OECPLayer(Color.Gray,OECPLayer.Type.Line, OECPLayer.LineFcType.Aux);
-            _aLineLayer.LayerControl = _lControl;
 
             _vertexLayer = new OECPLayer(Color.Black, OECPLayer.Type.Vertex);
-            _vertexControl = new OECPVertexControlPanel(_canvas,_vertexLayer) { Dock = DockStyle.Fill };
-            _vertexLayer.LayerControl = _vertexControl;
-            _controlList.AddRange(new List<UserControl>(){ _gridControl, _vertexControl, _lControl });
-
+           
             var trueCanvas = (OECPCanvas) _canvas;
             trueCanvas.Layers = new List<OECPLayer>(){ _mLineLayer , _vLineLayer , _aLineLayer , _vertexLayer};
             trueCanvas.RegisterLayerPtr(_gridLayer, _mLineLayer, _vLineLayer, _vertexLayer, _aLineLayer);
@@ -166,17 +164,31 @@ namespace OECP.NET.ControlStation
         {
             AllLayerControlInvisible();
             if (layer.IsVisible)
-                if (layer.LayerControl != null)
+            {
+                _canvas.ChangeCurrentLayer(layer);
+                if (layer.IsGrid)
                 {
-                    if (layer.IsLine)
-                    {
-                        var ll = (OECPLineControlPanel)layer.LayerControl;
-                        ll.SetLayerUnderControl(layer);
-                    }
-                        
-                    layer.LayerControl.Visible = true;
-                    _canvas.ChangeCurrentLayer(layer);
+                    _gridControl.Visible = true;
                 }
+                else if (layer.IsLine)
+                {
+                    _lControl.Visible = true;
+                    if (_lineTool == null)
+                    {
+                        _lineTool = new LineTool();
+                    }
+                    _canvas.SetCurrentDrawTool(_lineTool);
+                }
+                else
+                {
+                    _vertexControl.Visible = true;
+                    if ((_vtxTool) == null)
+                    {
+                        _vtxTool = new VertexTool();
+                    }
+                    _canvas.SetCurrentDrawTool(_vtxTool);
+                }
+            }
                   
         }
 
@@ -191,13 +203,7 @@ namespace OECP.NET.ControlStation
         private void LayerVisControl(bool visible, OECPLayer layer)
         {
             layer.IsVisible = visible;
-            if (layer.IsLine)
-            {
-                var ll = (OECPLineControlPanel)layer.LayerControl;
-                ll.SetLayerUnderControl(layer);
-            }
-            ILayerControl il = (ILayerControl) layer.LayerControl;
-            il?.ControlLayerVisibility(visible);
+           _canvas.SetLayerVisible(visible, layer);
         }
 
 

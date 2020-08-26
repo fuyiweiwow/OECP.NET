@@ -9,6 +9,8 @@ namespace OECP.NET.Model
 {
     public class OECPElement
     {
+        public Guid  Eid { get; set; }
+
         public enum ElementType
         {
             Undefined = -1,
@@ -16,6 +18,7 @@ namespace OECP.NET.Model
             Line = 1
         }
 
+        public OECPLayer Layer { get; set; }
 
         public ElementType Type { get; set; }
              
@@ -37,6 +40,7 @@ namespace OECP.NET.Model
             Type = ElementType.Undefined;
             ElementColor = color;
             IsHighLight = false;
+            Eid = Guid.NewGuid();
         }
 
         public static OECPElement Empty()

@@ -19,15 +19,13 @@ namespace OECP.NET.ControlStation
         private readonly int _maxGridNum = 256;
 
         public int MaxGridNum => _maxGridNum;
-        private OECPLayer _layer;
 
-        public OECPGridControlPanel(ICanvasSignal canvas,OECPLayer layer)
+        public OECPGridControlPanel(ICanvasSignal canvas)
         {
             InitializeComponent();
             _canvas = canvas;
             _lastProperValue = (int)nudGridNum.Value;
             this.BorderStyle = BorderStyle.None;
-            _layer = layer;
         }
 
 
@@ -58,11 +56,6 @@ namespace OECP.NET.ControlStation
         {
             nudGridNum.Value = 0;
             _canvas.UpdateGrid(0);
-        }
-
-        public void ControlLayerVisibility(bool visible)
-        {
-            _canvas.SetLayerVisible(visible,_layer);
         }
 
 

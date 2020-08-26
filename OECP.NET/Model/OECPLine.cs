@@ -11,20 +11,25 @@ namespace OECP.NET.Model
         public OECPVertex StartVertex { get; set; }
         public OECPVertex EndVertex { get; set; }
 
-
-        public OECPLine()
+        private bool IsBoundary { get; set; }
+        public OECPLine(bool isBoundary = false)
         {
             StartVertex = (OECPVertex)Empty();
             EndVertex = (OECPVertex)Empty();
             IsEmpty = true;
             Type = ElementType.Line;
+            IsBoundary = isBoundary;
         }
 
-        public OECPLine(OECPVertex stVtx, OECPVertex edVtx)
+        public OECPLine(OECPVertex stVtx, OECPVertex edVtx, bool isBoundary = false)
         {
             StartVertex = stVtx;
             EndVertex = edVtx;
             Type = ElementType.Line;
+            IsBoundary = isBoundary;
+
+            stVtx.RelatedLineList.Add(this.Eid);
+            edVtx.RelatedLineList.Add(this.Eid);
         }
 
         public double Distance(OECPVertex vtx)
@@ -67,8 +72,17 @@ namespace OECP.NET.Model
             double moleculey = b1b1 * y3 + a1b1 * x3 - a1 * x1y2 + a1 * x2y1;
             double moleculex = a1a1 * x3 + a1b1 * y3 - b1 * x2y1 + b1 * x1y2;
 
-            return new OECPVertex((float)(moleculex / denominator), (float)(moleculey / denominator));
+            var pvtx = new OECPVertex((float)(moleculex / denominator), (float)(moleculey / denominator));
+            if (!IsBoundary)
+            {
+                var newLine = new OECPLine(pvtx, this.EndVertex);
+                this.EndVertex.RelatedLineList.Remove(this.Eid);
 
+                this.Layer.AddElement(newLine);
+                this.EndVertex = pvtx;
+            }
+
+            return pvtx;
 
         }
 

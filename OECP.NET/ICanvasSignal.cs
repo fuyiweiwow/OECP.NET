@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using OECP.NET.CanvasTools;
 using OECP.NET.Model;
 
 namespace OECP.NET
@@ -31,7 +32,15 @@ namespace OECP.NET
 
         RectangleF GetPrimeSquare();
 
+        void SetCurrentSquareLocation(PointF ptf);
+
         bool VertexOnLine(OECPVertex vtx,ref OECPVertex projVtx );
+
+        void SetCurrentDrawTool(DrawTool dtool);
+
+        int CanvasLeft();
+
+        int CanvasTop();
 
     }
 }

@@ -54,7 +54,7 @@ namespace OECP.NET.Canvas
         {
             foreach (OECPLayer lineLayer in lineLayers)
             {
-                foreach (OECPElement ele in lineLayer.Elements)
+                foreach (OECPElement ele in lineLayer.LayerElements())
                 {
                     var line = (OECPLine) ele;
 

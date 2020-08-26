@@ -34,7 +34,7 @@ namespace OECP.NET.CanvasTools
             var ele = CurrentLayer().SearchForHighLight(e.Location.X, e.Location.Y, false);
             if (!ele.IsEmpty)
                 return;
-            _canvas.VertexLayer().Elements.Add(_projVtx);
+            _canvas.VertexLayer().AddElement(_projVtx);
             _canvas.RepaintCanvas();
         }
 
@@ -67,10 +67,10 @@ namespace OECP.NET.CanvasTools
 
         bool VertexAtBoundary(OECPVertex vtx , RectangleF square)
         {
-            var leftLine = new OECPLine(new OECPVertex(square.Left, square.Top), new OECPVertex(square.Left, square.Bottom));
-            var rightLine = new OECPLine(new OECPVertex(square.Right, square.Top), new OECPVertex(square.Right, square.Bottom));
-            var topLine = new OECPLine(new OECPVertex(square.Left, square.Top), new OECPVertex(square.Right, square.Top));
-            var botLine = new OECPLine(new OECPVertex(square.Left, square.Bottom), new OECPVertex(square.Right, square.Bottom));
+            var leftLine = new OECPLine(new OECPVertex(square.Left, square.Top), new OECPVertex(square.Left, square.Bottom), true);
+            var rightLine = new OECPLine(new OECPVertex(square.Right, square.Top), new OECPVertex(square.Right, square.Bottom), true);
+            var topLine = new OECPLine(new OECPVertex(square.Left, square.Top), new OECPVertex(square.Right, square.Top), true);
+            var botLine = new OECPLine(new OECPVertex(square.Left, square.Bottom), new OECPVertex(square.Right, square.Bottom), true);
 
             bool onLeft = leftLine.VertexOnLine(vtx);
             if (onLeft)

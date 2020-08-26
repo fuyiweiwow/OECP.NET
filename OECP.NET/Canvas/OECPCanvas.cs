@@ -32,7 +32,6 @@ namespace OECP.Canvas
         private OECPLayer _aLineLayer;
         private OECPLayer _vtxLayer;
 
-        private DrawTool _drawingTool;
 
         private PanTool _panTool;
 
@@ -43,6 +42,7 @@ namespace OECP.Canvas
         private bool _cornerInit = false;
 
         private ContextMenuStrip _rclMenuStrip;
+        private DrawTool _drawTool;
 
 
         public OECPCanvas()
@@ -52,22 +52,36 @@ namespace OECP.Canvas
         public void Init()
         {
             this.DoubleBuffered = true;
+            CommonEventHandler();
+            _square = CanvasUtil.GetPrimeSquare(this.Parent.Width, this.Parent.Height);
+            _dSquare = _square;
+            this.BackColor = Color.White;
+            InitRightClickMenu();
+            InitPanTool();
+
+            _deleteTool = new DeleteTool();
+            _deleteTool.StopWorking();
+        }
+
+        private void CommonEventHandler()
+        {
             this.MouseWheel += OECPCanvas_MouseWheel;
             this.Paint += OECPCanvas_Paint;
             this.MouseDown += OECPCanvas_MouseDown;
             this.MouseMove += OECPCanvas_MouseMove;
             this.MouseUp += OECPCanvas_MouseUp;
-            _square = CanvasUtil.GetPrimeSquare(this.Parent.Width, this.Parent.Height);
-            _dSquare = _square;
-            this.BackColor = Color.White;
-            InitRightClickMenu();
-            _drawingTool = new DrawTool();
-            _drawingTool.StopWorking();
-            _panTool = new PanTool();
-            _panTool.StopWorking();
-            _deleteTool = new DeleteTool();
-            _deleteTool.StopWorking();
         }
+
+        private void InitPanTool()
+        {
+            _panTool = new PanTool();
+            _panTool.SetCanvas(this);
+            _panTool.SetWaiting();
+            this.MouseMove += _panTool.CanvasTool_MouseMove;
+            this.MouseDown += _panTool.CanvasTool_MouseDown;
+            this.MouseUp += _panTool.CanvasTool_MouseUp;
+        }
+
 
         public void RegisterLayerPtr(OECPLayer gird, OECPLayer ml, OECPLayer vl, OECPLayer vtx, OECPLayer aux)
         {
@@ -102,32 +116,10 @@ namespace OECP.Canvas
 
         private void OECPCanvas_MouseUp(object sender, MouseEventArgs e)
         {
-            if (_panTool.IsWorking())
-                _panTool.StopWorking();
-            if (_deleteTool.IsWorking())
-                _deleteTool.SetWaiting();
         }
 
         private void OECPCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_panTool.IsWorking())
-            {
-                _panTool.EndPoint = new PointF(this.Left + e.Location.X - _panTool.StartPoint.X,
-                    this.Top + e.Location.Y - _panTool.StartPoint.Y);
-                _square.Location = _panTool.EndPoint;
-                
-            }
-            if(_deleteTool.IsWaiting())
-            {
-                if (_curLayer == null)
-                    return;
-                OECPVertex ivtx = new OECPVertex(e.Location.X, e.Location.Y);
-                var t = C2I(ivtx);
-                _lastHighLight = _curLayer.SearchForHighLight(t.X, t.Y);
-                if(!_lastHighLight.IsEmpty)
-                    _deleteTool.SetBusy();
-                this.Invalidate();
-            }
         }
 
         private void OECPCanvas_MouseDown(object sender, MouseEventArgs e)
@@ -139,31 +131,9 @@ namespace OECP.Canvas
             }
         }
 
-
         private void OECPCanvas_Paint(object sender, PaintEventArgs e)
         {
             ResetSquare(_square, e.Graphics);
-            DeleteWork();
-        }
-
-        private void DeleteWork()
-        {
-            if (!_deleteTool.IsWorking())
-                return;
-            if (_curLayer.IsLine)
-            {
-
-            }
-            else
-            {
-                if(_lastHighLight == null) return;
-                if (_lastHighLight.IsEmpty) return;
-                var selVtx = (OECPVertex)_lastHighLight;
-                if (selVtx.IsCornerVertex)
-                    return;
-                _curLayer.DeleteVertex(selVtx);
-            }
-
         }
 
         //获得初始正方形上对应的点
@@ -206,6 +176,11 @@ namespace OECP.Canvas
             return _dSquare;
         }
 
+        public void SetCurrentSquareLocation(PointF ptf)
+        {
+            _square.Location = ptf;
+        }
+
         public bool VertexOnLine(OECPVertex vtx, ref OECPVertex projVtx)
         {
             var lst = new List<OECPLayer>();
@@ -218,6 +193,31 @@ namespace OECP.Canvas
                 lst.Add(layer);
             }
             return CanvasUtil.VertexOnLine(vtx, lst, ref projVtx);
+        }
+
+        public void SetCurrentDrawTool(DrawTool dtool)
+        {
+            if (_drawTool != null)
+            {
+                MouseMove -= _drawTool.CanvasTool_MouseMove;
+                MouseDown -= _drawTool.CanvasTool_MouseDown;
+                Paint -= _drawTool.CanvasTool_Paint;
+            }
+            _drawTool = dtool;
+            _drawTool.SetCanvas(this);
+            MouseMove += _drawTool.CanvasTool_MouseMove;
+            MouseDown += _drawTool.CanvasTool_MouseDown;
+            Paint += _drawTool.CanvasTool_Paint;
+        }
+
+        public int CanvasLeft()
+        {
+            return Left;
+        }
+
+        public int CanvasTop()
+        {
+            return Top;
         }
 
         //将初始矩形的坐标投影到当前画布状态
@@ -257,12 +257,12 @@ namespace OECP.Canvas
             Pen p = new Pen(Color.Black);
             if (layer.IsLine)
             {
-                foreach (var ele in layer.Elements)
+                foreach (var ele in layer.LayerElements())
                     DrawLineElements(ele, p, layer, g);
             }
             else
             {
-                foreach (var ele in layer.Elements)
+                foreach (var ele in layer.LayerElements())
                     DrawVertexElement(ele, p, layer, g);
             }
         }
@@ -304,7 +304,7 @@ namespace OECP.Canvas
             var tr = C2I(new OECPVertex(_square.Right, _square.Top, true));
             var rb = C2I(new OECPVertex(_square.Right, _square.Bottom, true));
             var lb = C2I(new OECPVertex(_square.Left, _square.Bottom, true));
-            _vtxLayer.Elements.AddRange(new List<OECPElement>(){tl,tr,rb,lb});
+            _vtxLayer.AddElements(new List<OECPElement>(){tl,tr,rb,lb});
         }
 
         private void OECPCanvas_MouseWheel(object sender, MouseEventArgs e)
@@ -335,23 +335,12 @@ namespace OECP.Canvas
 
         public void StartDrawing()
         {
-            if (_curLayer.IsLine)
-                _drawingTool = new LineTool();
-            else
-                _drawingTool = new VertexTool();
-            _drawingTool.SetCanvas(this);
-            MouseMove += _drawingTool.CanvasTool_MouseMove;
-            MouseDown += _drawingTool.CanvasTool_MouseDown;
-            Paint += _drawingTool.CanvasTool_Paint;
-            _drawingTool.SetWaiting(); 
+            _drawTool.SetWaiting();
         }
 
         public void StopDrawing()
         {
-            _drawingTool.StopWorking();
-            MouseMove -= _drawingTool.CanvasTool_MouseMove;
-            MouseDown -= _drawingTool.CanvasTool_MouseDown;
-            Paint -= _drawingTool.CanvasTool_Paint;
+            _drawTool.StopWorking();
         }
 
         public void DeleteMode(bool onDelete)

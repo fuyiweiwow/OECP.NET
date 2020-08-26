@@ -36,7 +36,7 @@ namespace OECP.NET.CanvasTools
                 SetBusy();
                 var st = _canvas.C2I(vtx);
                 _ptCollection.Add(st);
-                _canvas.VertexLayer().Elements.Add(st);
+                _canvas.VertexLayer().AddElement(st);
                 _canvas.RepaintCanvas();
                 return;
             }
@@ -50,10 +50,10 @@ namespace OECP.NET.CanvasTools
                     
                     var edPt = _canvas.C2I(vtx);
                     _ptCollection.Add(edPt);
-                    _canvas.VertexLayer().Elements.AddRange(_ptCollection);
+                    _canvas.VertexLayer().AddElements(_ptCollection);
 
                     var line = new OECPLine(_ptCollection[0], _ptCollection[1]);
-                    CurrentLayer().Elements.Add(line);
+                    CurrentLayer().AddElement(line);
 
                     _ptCollection.Clear();
                     _canvas.RepaintCanvas();

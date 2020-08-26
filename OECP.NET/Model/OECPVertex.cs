@@ -17,7 +17,10 @@ namespace OECP.NET.Model
 
         public float BufferTolerance { get; set; } = 1F;
 
-
+        /// <summary>
+        /// 点关联的线id
+        /// </summary>
+        public List<Guid> RelatedLineList { get; set; }
 
         public OECPVertex()
         {
